@@ -19,7 +19,8 @@ import {
   UploadCloud,
   FileCode,
   Shield,
-  Eye
+  Eye,
+  BookOpen
 } from "lucide-react";
 import { NavHeader } from "@/components/layout/nav-header";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -116,6 +117,13 @@ export default function ApplicationDetailPage() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
+  // Milestone 4: Rules, Sources & Verification States
+  const [rulePack, setRulePack] = useState<any | null>(null);
+  const [selectedAuthority, setSelectedAuthority] = useState<string>("fire_department");
+  const [selectedMode, setSelectedMode] = useState<string>("match");
+  const [verificationQuerying, setVerificationQuerying] = useState<boolean>(false);
+  const [verificationResponse, setVerificationResponse] = useState<any | null>(null);
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -136,6 +144,14 @@ export default function ApplicationDetailPage() {
       } catch (fErr) {
         setFindings([]);
       }
+
+      // Load rules for compliance matrix
+      try {
+        const rulesData = await fetchApi<any>("/rules");
+        setRulePack(rulesData);
+      } catch (rErr) {
+        setRulePack(null);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -155,6 +171,40 @@ export default function ApplicationDetailPage() {
       alert(`Validation check failed: ${err.message}`);
     } finally {
       setValidating(false);
+    }
+  };
+
+  const handleExecuteVerification = async () => {
+    try {
+      setVerificationQuerying(true);
+      const payload: any = {
+        institute_pid: application?.institution?.permanent_id || "1-9876543210",
+        institution_name: application?.institution?.name || "ABC Institute of Technology"
+      };
+
+      if (selectedAuthority === "fire_department") {
+        payload.certificate_number = "FS/2026/8891";
+        payload.valid_until_date = "2027-01-09";
+      } else if (selectedAuthority === "state_university") {
+        payload.order_number = "AUT/AFFIL/2026-27/4491";
+      } else if (selectedAuthority === "aicte_portal") {
+        payload.intake_capacity = 60;
+      }
+
+      const res = await fetchApi<any>("/verification/query", {
+        method: "POST",
+        body: JSON.stringify({
+          authority_id: selectedAuthority,
+          query_payload: payload,
+          mode: selectedMode,
+          simulated_delay_ms: 180
+        })
+      });
+      setVerificationResponse(res);
+    } catch (err: any) {
+      alert(`Verification query failed: ${err.message}`);
+    } finally {
+      setVerificationQuerying(false);
     }
   };
 
@@ -675,16 +725,243 @@ export default function ApplicationDetailPage() {
           </div>
         )}
 
-        {/* Placeholder tab views for subsequent milestones */}
-        {activeTab !== "documents" && activeTab !== "audit" && activeTab !== "findings" && (
+        {/* Tab 4: Compliance Matrix (M4) */}
+        {activeTab === "compliance" && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-200">
+                  Regulatory Compliance Matrix
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Complete cross-referencing of application evidence against Approval Process Handbook draft norms.
+                </p>
+              </div>
+
+              <Link
+                href="/rules"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface hover:bg-surface-hover border border-surface-border text-xs text-accent font-semibold transition-colors"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Explore All Rules & Sources</span>
+              </Link>
+            </div>
+
+            {/* Draft Citation Banner */}
+            <div className="p-3.5 rounded-lg bg-amber-950/30 border border-amber-800/80 text-xs flex items-start gap-3 text-amber-200">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold block text-[11px] uppercase tracking-wide">
+                  UNVERIFIED AGAINST CURRENT HANDBOOK: DRAFT RULES FOR DEMO DECISION SUPPORT
+                </span>
+                <p className="text-amber-200/80 text-[11px] mt-0.5">
+                  Every cell below contains an official source citation marked "TBD: confirm against official handbook".
+                </p>
+              </div>
+            </div>
+
+            {/* Matrix Table */}
+            <div className="bg-surface-card rounded-lg border border-surface-border overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-slate-300">
+                  <thead className="bg-surface text-muted-foreground font-mono uppercase text-[10px] border-b border-surface-border">
+                    <tr>
+                      <th className="py-3 px-4">Rule ID</th>
+                      <th className="py-3 px-4">Requirement</th>
+                      <th className="py-3 px-4">Evidence Document</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Official Handbook Citation</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-surface-border">
+                    {(rulePack?.rules || []).map((rule: any) => {
+                      const relatedFinding = findings.find(f => f.rule_id === rule.rule_id);
+                      const status = relatedFinding ? relatedFinding.severity : "pass";
+
+                      return (
+                        <tr key={rule.rule_id} className="hover:bg-surface/50 transition-colors">
+                          <td className="py-3 px-4 font-mono font-bold text-slate-200 whitespace-nowrap">
+                            {rule.rule_id}
+                          </td>
+                          <td className="py-3 px-4 max-w-xs">
+                            <div className="font-semibold text-slate-200">{rule.title}</div>
+                            <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                              {rule.explanation_template}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 font-mono text-[11px] text-slate-400">
+                            {rule.required_evidence?.join(", ") || "General Evidence"}
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            <StatusBadge status={status} />
+                          </td>
+                          <td className="py-3 px-4 max-w-sm">
+                            <div className="font-mono text-[11px] text-slate-300">
+                              {rule.source_document}
+                            </div>
+                            <div className="font-mono text-[10px] text-amber-400 mt-0.5">
+                              {rule.section_page}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 5: External Verification (M4) */}
+        {activeTab === "verification" && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-200">
+                  External Authority Registry Verification
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Direct cross-referencing against external statutory databases (Fire NOC, University Affiliation, AICTE Central).
+                </p>
+              </div>
+            </div>
+
+            {/* Mandatory Simulated Banner per Non-Negotiable Principle 4 */}
+            <div className="p-4 rounded-lg bg-cyan-950/40 border border-cyan-800 text-cyan-200 text-xs flex items-start gap-3">
+              <Cpu className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <span className="font-bold font-mono tracking-wide uppercase text-[11px] text-cyan-300 block">
+                  SIMULATED EXTERNAL ISSUER - DEMO ONLY
+                </span>
+                <p className="text-cyan-200/90 text-[11px] leading-relaxed">
+                  Connectors below simulate asynchronous queries to state registries. Use the scenario mode switcher to test handling of confirmed credentials, discrepancies, timeouts, or authority service outages.
+                </p>
+              </div>
+            </div>
+
+            {/* Query Control Bar */}
+            <div className="p-5 rounded-lg bg-surface-card border border-surface-border space-y-4">
+              <h4 className="text-xs font-mono uppercase text-muted-foreground tracking-wider">
+                Select Authority & Simulation Mode
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                    Target External Authority
+                  </label>
+                  <select
+                    value={selectedAuthority}
+                    onChange={(e) => setSelectedAuthority(e.target.value)}
+                    className="w-full bg-surface border border-surface-border rounded p-2 text-xs text-slate-200 focus:outline-none focus:border-accent"
+                  >
+                    <option value="fire_department">State Fire & Rescue Services Licensing Portal</option>
+                    <option value="state_university">Affiliating State Technical University Registry</option>
+                    <option value="aicte_portal">AICTE Central Institutional Registry</option>
+                    <option value="municipal_corporation">Municipal Corporation Structural Safety Cell</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                    Simulation Response Mode
+                  </label>
+                  <select
+                    value={selectedMode}
+                    onChange={(e) => setSelectedMode(e.target.value)}
+                    className="w-full bg-surface border border-surface-border rounded p-2 text-xs text-slate-200 focus:outline-none focus:border-accent"
+                  >
+                    <option value="match">Match (Verified Active Record)</option>
+                    <option value="mismatch">Mismatch (Contradictory Record on File)</option>
+                    <option value="not_found">Not Found (Record Absent from Registry)</option>
+                    <option value="timeout">Timeout (504 Gateway Delay)</option>
+                    <option value="service_down">Service Down (503 Maintenance)</option>
+                  </select>
+                </div>
+
+                <div className="flex items-end">
+                  <button
+                    onClick={handleExecuteVerification}
+                    disabled={verificationQuerying}
+                    className="w-full py-2 px-4 rounded bg-accent text-accent-foreground font-semibold text-xs hover:bg-teal-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  >
+                    <Cpu className={`w-3.5 h-3.5 ${verificationQuerying ? "animate-spin" : ""}`} />
+                    <span>{verificationQuerying ? "Querying Registry..." : "Query External Registry"}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Verification Response Inspector */}
+            {verificationResponse && (
+              <div className="p-5 rounded-lg bg-surface-card border border-surface-border space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-surface-border">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-sm text-slate-100">
+                      {verificationResponse.authority_name}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold ${
+                      verificationResponse.status === "verified"
+                        ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                        : verificationResponse.status === "mismatch"
+                        ? "bg-rose-950 text-rose-300 border border-rose-800"
+                        : "bg-amber-950 text-amber-300 border border-amber-800"
+                    }`}>
+                      {verificationResponse.status}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3 text-[11px] font-mono text-muted-foreground">
+                    <span>Latency: <strong className="text-cyan-400">{verificationResponse.latency_ms} ms</strong></span>
+                    <span>·</span>
+                    <span>{new Date(verificationResponse.timestamp).toLocaleTimeString()}</span>
+                  </div>
+                </div>
+
+                {verificationResponse.error_message && (
+                  <div className="p-3 rounded bg-rose-950/40 border border-rose-800/80 text-rose-200 text-xs">
+                    <strong>Error / Alert:</strong> {verificationResponse.error_message}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] uppercase text-muted-foreground block font-bold">
+                      Query Sent to Registry:
+                    </span>
+                    <pre className="p-3 rounded bg-surface border border-surface-border text-slate-300 overflow-x-auto text-[11px]">
+                      {JSON.stringify(verificationResponse.query_sent, null, 2)}
+                    </pre>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] uppercase text-muted-foreground block font-bold">
+                      Registry Response Payload:
+                    </span>
+                    <pre className="p-3 rounded bg-surface border border-surface-border text-slate-300 overflow-x-auto text-[11px]">
+                      {JSON.stringify(verificationResponse.response_payload, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+
+                <div className="pt-2 text-[10px] font-mono text-cyan-400/80 border-t border-surface-border/40">
+                  {verificationResponse.badge} · {verificationResponse.note}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 6: Placeholder for Report Export (M5) */}
+        {activeTab === "report" && (
           <div className="bg-surface-card p-12 rounded-lg border border-surface-border text-center space-y-3">
-            <Layers className="w-8 h-8 text-accent mx-auto" />
+            <Download className="w-8 h-8 text-accent mx-auto" />
             <h4 className="font-semibold text-slate-200 text-sm">
-              Tab Scheduled for Subsequent Pipeline Milestone
+              Exportable Audit Dossier & Reviewer Report
             </h4>
             <p className="text-xs text-muted-foreground max-w-md mx-auto">
-              This module will be populated as extraction (M2), rule validation (M3), external verification (M4), 
-              and the review action console (M5) are incrementally integrated.
+              Scrutiny officer decision capture, endorsement rationale, and exportable PDF/JSON case dossier will be assembled in Milestone 5.
             </p>
           </div>
         )}

@@ -49,6 +49,7 @@ export function NavHeader() {
           <nav className="hidden md:flex items-center gap-5 text-xs font-medium text-slate-300">
             <Link href="/dashboard" className="hover:text-accent transition-colors">Queue</Link>
             <Link href="/applications/new" className="hover:text-accent transition-colors">New Intake</Link>
+            <Link href="/rules" className="hover:text-accent transition-colors">Rule Explorer</Link>
             <Link href="/evaluation" className="hover:text-accent transition-colors">Evaluation Harness</Link>
           </nav>
         </div>
