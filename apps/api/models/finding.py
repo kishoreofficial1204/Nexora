@@ -44,6 +44,9 @@ class Finding(Base):
     evidence_refs_json = Column(Text, default="[]")  # List[Dict[str, Any]]
     confidence = Column(Float, default=1.0)
     is_heuristic = Column(Boolean, default=False)
+    review_rationale = Column(Text, nullable=True)
+    reviewed_by = Column(String(36), nullable=True)
+    reviewed_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

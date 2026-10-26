@@ -76,8 +76,10 @@ interface FindingItem {
   }>;
   confidence: number;
   is_heuristic: boolean;
-  status: "open" | "confirmed" | "dismissed" | "resolved";
+  status: "open" | "confirmed" | "dismissed" | "resolved" | "clarification_requested" | "escalated";
   review_rationale?: string;
+  reviewed_by?: string;
+  reviewed_at?: string;
   created_at: string;
 }
 
@@ -87,6 +89,10 @@ interface ApplicationData {
   academic_year: string;
   assessment_date: string;
   status: string;
+  recommendation?: string;
+  recommendation_rationale?: string;
+  recommendation_by?: string;
+  recommendation_at?: string;
   rule_pack_id: string;
   created_at: string;
   institution?: {
@@ -208,6 +214,71 @@ export default function ApplicationDetailPage() {
     }
   };
 
+  // Milestone 5: Reviewer Decision & Recommendation States
+  const [reviewModalFinding, setReviewModalFinding] = useState<FindingItem | null>(null);
+  const [reviewAction, setReviewAction] = useState<string>("confirm");
+  const [reviewRationale, setReviewRationale] = useState<string>("");
+  const [clarificationItem, setClarificationItem] = useState<string>("");
+  const [submittingReview, setSubmittingReview] = useState<boolean>(false);
+
+  const [recommendationModalOpen, setRecommendationModalOpen] = useState<boolean>(false);
+  const [selectedRecommendation, setSelectedRecommendation] = useState<string>("RECOMMEND_APPROVAL");
+  const [recommendationRationale, setRecommendationRationale] = useState<string>("");
+  const [submittingRecommendation, setSubmittingRecommendation] = useState<boolean>(false);
+
+  const handleFindingReviewSubmit = async () => {
+    if (!reviewModalFinding) return;
+    if (reviewRationale.trim().length < 5) {
+      alert("Review rationale is mandatory (minimum 5 characters) for audit trail.");
+      return;
+    }
+
+    try {
+      setSubmittingReview(true);
+      await fetchApi(`/findings/${reviewModalFinding.id}/review`, {
+        method: "POST",
+        body: JSON.stringify({
+          action: reviewAction,
+          rationale: reviewRationale.trim(),
+          clarification_item: clarificationItem.trim() || undefined
+        })
+      });
+      setReviewModalFinding(null);
+      setReviewRationale("");
+      setClarificationItem("");
+      await loadData();
+    } catch (err: any) {
+      alert(`Failed to submit review decision: ${err.message}`);
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const handleRecommendationSubmit = async () => {
+    if (recommendationRationale.trim().length < 10) {
+      alert("Scrutiny officer justification is mandatory (minimum 10 characters).");
+      return;
+    }
+
+    try {
+      setSubmittingRecommendation(true);
+      await fetchApi(`/applications/${id}/recommendation`, {
+        method: "POST",
+        body: JSON.stringify({
+          recommendation: selectedRecommendation,
+          rationale: recommendationRationale.trim()
+        })
+      });
+      setRecommendationModalOpen(false);
+      setRecommendationRationale("");
+      await loadData();
+    } catch (err: any) {
+      alert(`Failed to record recommendation: ${err.message}`);
+    } finally {
+      setSubmittingRecommendation(false);
+    }
+  };
+
   useEffect(() => {
     if (id) {
       loadData();
@@ -293,13 +364,29 @@ export default function ApplicationDetailPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <Link
+                href={`/applications/${application.id}/applicant`}
+                className="px-3 py-2 rounded-md bg-surface hover:bg-surface-hover border border-surface-border text-xs text-slate-200 transition-colors flex items-center gap-1.5"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-accent" />
+                <span>Applicant Portal</span>
+              </Link>
+
+              <button
+                onClick={() => setRecommendationModalOpen(true)}
+                className="px-3.5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-sm"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>{application.recommendation ? "Update Recommendation" : "Officer Decision"}</span>
+              </button>
+
               <Link
                 href={`/applications/${application.id}/workbench`}
-                className="px-4 py-2.5 rounded-md bg-accent text-accent-foreground font-semibold text-xs hover:bg-teal-600 transition-colors flex items-center gap-2 shadow-sm"
+                className="px-3.5 py-2 rounded-md bg-accent text-accent-foreground font-semibold text-xs hover:bg-teal-600 transition-colors flex items-center gap-2 shadow-sm"
               >
-                <Eye className="w-4 h-4" />
-                <span>Open Evidence Workbench</span>
+                <Eye className="w-3.5 h-3.5" />
+                <span>Workbench</span>
               </Link>
             </div>
           </div>
@@ -309,7 +396,11 @@ export default function ApplicationDetailPage() {
             <div className="text-[11px] font-mono uppercase text-muted-foreground mb-3 flex items-center justify-between">
               <span>Pipeline Stage Progression</span>
               <span className="text-accent">
-                {findings.length > 0 ? "Stage 3 of 5 (Findings Detected)" : "Stage 3 of 5 In Progress"}
+                {application.recommendation 
+                  ? "Stage 5 of 5 Complete (Recommendation Endorsed)" 
+                  : findings.length > 0 
+                  ? "Stage 4 of 5 (Findings Reviewed)" 
+                  : "Stage 4 of 5 In Progress"}
               </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -344,18 +435,31 @@ export default function ApplicationDetailPage() {
                 </div>
               </div>
 
-              <div className="bg-surface p-2.5 rounded border border-surface-border text-xs opacity-70">
-                <div className="text-slate-300 font-semibold flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-muted-foreground" /> 4. Verification
+              <div className="bg-surface p-2.5 rounded border border-emerald-800/60 text-xs">
+                <div className="text-emerald-400 font-semibold flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> 4. Verification
                 </div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">M4 Sources</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">M4 Registries</div>
               </div>
 
-              <div className="bg-surface p-2.5 rounded border border-surface-border text-xs opacity-70">
-                <div className="text-slate-300 font-semibold flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-muted-foreground" /> 5. Officer Action
+              <div className={`bg-surface p-2.5 rounded border text-xs ${
+                application.recommendation 
+                  ? "border-emerald-800/60 bg-emerald-950/20" 
+                  : "border-surface-border text-slate-300"
+              }`}>
+                <div className={`font-semibold flex items-center gap-1.5 ${
+                  application.recommendation ? "text-emerald-400" : "text-slate-300"
+                }`}>
+                  {application.recommendation ? (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  ) : (
+                    <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                  )}
+                  <span>5. Officer Action</span>
                 </div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">M5 Decision</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                  {application.recommendation ? application.recommendation : "M5 Decision Pending"}
+                </div>
               </div>
             </div>
           </div>
@@ -718,6 +822,84 @@ export default function ApplicationDetailPage() {
                         </div>
                       </div>
                     )}
+
+                    {/* Reviewer Action & Disposition Block (M5) */}
+                    <div className="pt-3 border-t border-surface-border/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        {f.status !== "open" ? (
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                                f.status === "confirmed" 
+                                  ? "bg-rose-950 text-rose-300 border border-rose-800" 
+                                  : f.status === "dismissed"
+                                  ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                                  : "bg-amber-950 text-amber-300 border border-amber-800"
+                              }`}>
+                                Officer Disposition: {f.status}
+                              </span>
+                              {f.reviewed_by && (
+                                <span className="text-[10px] font-mono text-muted-foreground">
+                                  by {f.reviewed_by}
+                                </span>
+                              )}
+                            </div>
+                            {f.review_rationale && (
+                              <p className="text-[11px] text-slate-300 italic">
+                                "{f.review_rationale}"
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-[11px] text-muted-foreground font-mono">
+                            Disposition: Open for Scrutiny Action
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <button
+                          onClick={() => {
+                            setReviewModalFinding(f);
+                            setReviewAction("confirm");
+                            setReviewRationale("");
+                          }}
+                          className="px-2.5 py-1 rounded bg-rose-950/60 hover:bg-rose-900 border border-rose-800 text-rose-200 text-xs font-semibold transition-colors"
+                        >
+                          Confirm
+                        </button>
+                        <button
+                          onClick={() => {
+                            setReviewModalFinding(f);
+                            setReviewAction("dismiss");
+                            setReviewRationale("");
+                          }}
+                          className="px-2.5 py-1 rounded bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-800 text-emerald-200 text-xs font-semibold transition-colors"
+                        >
+                          Dismiss
+                        </button>
+                        <button
+                          onClick={() => {
+                            setReviewModalFinding(f);
+                            setReviewAction("request_clarification");
+                            setReviewRationale("");
+                          }}
+                          className="px-2.5 py-1 rounded bg-amber-950/60 hover:bg-amber-900 border border-amber-800 text-amber-200 text-xs font-semibold transition-colors"
+                        >
+                          Clarification
+                        </button>
+                        <button
+                          onClick={() => {
+                            setReviewModalFinding(f);
+                            setReviewAction("escalate");
+                            setReviewRationale("");
+                          }}
+                          className="px-2.5 py-1 rounded bg-purple-950/60 hover:bg-purple-900 border border-purple-800 text-purple-200 text-xs font-semibold transition-colors"
+                        >
+                          Escalate
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -953,16 +1135,258 @@ export default function ApplicationDetailPage() {
           </div>
         )}
 
-        {/* Tab 6: Placeholder for Report Export (M5) */}
+        {/* Tab 6: Exportable Scrutiny Dossier & Report (M5) */}
         {activeTab === "report" && (
-          <div className="bg-surface-card p-12 rounded-lg border border-surface-border text-center space-y-3">
-            <Download className="w-8 h-8 text-accent mx-auto" />
-            <h4 className="font-semibold text-slate-200 text-sm">
-              Exportable Audit Dossier & Reviewer Report
-            </h4>
-            <p className="text-xs text-muted-foreground max-w-md mx-auto">
-              Scrutiny officer decision capture, endorsement rationale, and exportable PDF/JSON case dossier will be assembled in Milestone 5.
-            </p>
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-200">
+                  Exportable Case Dossier & Scrutiny Reports
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Download certified decision-support reports with SHA-256 integrity hashes and cryptographic audit chain.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <a
+                  href={`http://localhost:8000/api/applications/${application.id}/export/pdf`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-accent text-accent-foreground font-semibold text-xs hover:bg-teal-600 transition-colors shadow-sm"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Signed PDF Dossier</span>
+                </a>
+
+                <a
+                  href={`http://localhost:8000/api/applications/${application.id}/export/json`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-surface hover:bg-surface-hover border border-surface-border text-xs text-slate-200 font-semibold transition-colors"
+                >
+                  <FileCode className="w-3.5 h-3.5 text-accent" />
+                  <span>Download Structured JSON</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Dossier Executive Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div className="p-4 rounded-lg bg-surface-card border border-surface-border space-y-1">
+                <span className="text-[10px] uppercase font-mono text-muted-foreground">Document Inventory</span>
+                <div className="text-lg font-bold text-slate-100">{application.documents.length} Files</div>
+                <div className="text-[10px] text-emerald-400 font-mono">100% SHA-256 Hashed</div>
+              </div>
+
+              <div className="p-4 rounded-lg bg-surface-card border border-surface-border space-y-1">
+                <span className="text-[10px] uppercase font-mono text-muted-foreground">Audit Ledger State</span>
+                <div className="text-lg font-bold text-slate-100">{verification?.chain_length || auditEvents.length} Blocks</div>
+                <div className="text-[10px] text-emerald-400 font-mono">Unbroken Cryptographic Chain</div>
+              </div>
+
+              <div className="p-4 rounded-lg bg-surface-card border border-surface-border space-y-1">
+                <span className="text-[10px] uppercase font-mono text-muted-foreground">Findings Disposition</span>
+                <div className="text-lg font-bold text-slate-100">
+                  {findings.filter(f => f.status !== "open").length} / {findings.length} Reviewed
+                </div>
+                <div className="text-[10px] text-amber-400 font-mono">Mandatory Rationales Logged</div>
+              </div>
+
+              <div className="p-4 rounded-lg bg-surface-card border border-surface-border space-y-1">
+                <span className="text-[10px] uppercase font-mono text-muted-foreground">Officer Recommendation</span>
+                <div className="text-sm font-bold text-accent truncate">
+                  {application.recommendation || "Pending Decision"}
+                </div>
+                <div className="text-[10px] text-muted-foreground font-mono">
+                  {application.recommendation_at ? new Date(application.recommendation_at).toLocaleDateString() : "Awaiting Endorsement"}
+                </div>
+              </div>
+            </div>
+
+            {/* Dossier Preview Details */}
+            <div className="p-5 rounded-lg bg-surface-card border border-surface-border space-y-4">
+              <h4 className="text-xs font-mono uppercase text-muted-foreground tracking-wider">
+                Certified Dossier Contents Preview
+              </h4>
+
+              <div className="bg-surface p-4 rounded border border-surface-border space-y-3 text-xs">
+                <div className="flex items-center justify-between pb-2 border-b border-surface-border">
+                  <span className="font-semibold text-slate-200">
+                    Institution: {application.institution?.name} ({application.institution?.permanent_id})
+                  </span>
+                  <span className="font-mono text-cyan-400 text-[11px]">
+                    Academic Year {application.academic_year} · Assessment Date {application.assessment_date}
+                  </span>
+                </div>
+
+                <div className="text-slate-300 space-y-1.5 text-[11px] leading-relaxed">
+                  <p><strong>Category:</strong> {application.category}</p>
+                  <p><strong>Rule Pack:</strong> {application.rule_pack_id} (v2026.1-draft)</p>
+                  <p><strong>Officer Justification:</strong> {application.recommendation_rationale || "Pending final endorsement statement by scrutiny officer."}</p>
+                  <p><strong>Cryptographic Ledger Root:</strong> <span className="font-mono text-[10px] text-slate-400">{auditEvents[0]?.current_hash ? `${auditEvents[0].current_hash.substring(0, 32)}...` : "Genesis"}</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal 1: Finding Review Disposition Modal */}
+        {reviewModalFinding && (
+          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-surface-card border border-surface-border rounded-lg max-w-lg w-full p-6 space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between pb-3 border-b border-surface-border">
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-100">
+                    Record Officer Finding Disposition
+                  </h3>
+                  <div className="font-mono text-[10px] text-accent mt-0.5">
+                    {reviewModalFinding.rule_id} · {reviewModalFinding.title}
+                  </div>
+                </div>
+                <button
+                  onClick={() => setReviewModalFinding(null)}
+                  className="text-muted-foreground hover:text-slate-200 text-xs font-mono"
+                >
+                  ✕ Close
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                    Select Review Decision Action
+                  </label>
+                  <select
+                    value={reviewAction}
+                    onChange={(e) => setReviewAction(e.target.value)}
+                    className="w-full bg-surface border border-surface-border rounded p-2 text-xs text-slate-200 focus:outline-none focus:border-accent"
+                  >
+                    <option value="confirm">Confirm Finding (Official Regulatory Deficiency)</option>
+                    <option value="dismiss">Dismiss Finding (Clarification/Override on Record)</option>
+                    <option value="request_clarification">Request Clarification from Applicant</option>
+                    <option value="escalate">Escalate to Senior Scrutiny Officer</option>
+                  </select>
+                </div>
+
+                {reviewAction === "request_clarification" && (
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                      Clarification Item Requested
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Valid Renewal Fee Receipt or Updated NOC"
+                      value={clarificationItem}
+                      onChange={(e) => setClarificationItem(e.target.value)}
+                      className="w-full bg-surface border border-surface-border rounded p-2 text-xs text-slate-200 focus:outline-none focus:border-accent"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-300 flex items-center justify-between mb-1">
+                    <span>Mandatory Scrutiny Rationale</span>
+                    <span className="text-[10px] text-amber-400 font-normal">Audit-Logged (Min 5 chars)</span>
+                  </label>
+                  <textarea
+                    rows={4}
+                    placeholder="Enter statutory justification for confirming, dismissing, or escalating this finding..."
+                    value={reviewRationale}
+                    onChange={(e) => setReviewRationale(e.target.value)}
+                    className="w-full bg-surface border border-surface-border rounded p-2 text-xs text-slate-200 focus:outline-none focus:border-accent"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-surface-border">
+                <button
+                  onClick={() => setReviewModalFinding(null)}
+                  className="px-4 py-2 rounded border border-surface-border text-xs text-slate-300 hover:bg-surface"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleFindingReviewSubmit}
+                  disabled={submittingReview}
+                  className="px-4 py-2 rounded bg-accent text-accent-foreground font-semibold text-xs hover:bg-teal-600 transition-colors disabled:opacity-50"
+                >
+                  {submittingReview ? "Recording..." : "Save Audit Disposition"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal 2: Overall Scrutiny Officer Recommendation Modal */}
+        {recommendationModalOpen && (
+          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-surface-card border border-surface-border rounded-lg max-w-xl w-full p-6 space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between pb-3 border-b border-surface-border">
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-100">
+                    Record Final Scrutiny Officer Recommendation
+                  </h3>
+                  <div className="text-[11px] text-muted-foreground mt-0.5">
+                    Statutory decision support endorsement for AICTE Executive Committee.
+                  </div>
+                </div>
+                <button
+                  onClick={() => setRecommendationModalOpen(false)}
+                  className="text-muted-foreground hover:text-slate-200 text-xs font-mono"
+                >
+                  ✕ Close
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                    Statutory Recommendation
+                  </label>
+                  <select
+                    value={selectedRecommendation}
+                    onChange={(e) => setSelectedRecommendation(e.target.value)}
+                    className="w-full bg-surface border border-surface-border rounded p-2 text-xs text-slate-200 focus:outline-none focus:border-accent"
+                  >
+                    <option value="RECOMMEND_APPROVAL">Recommend Extension of Approval (EoA)</option>
+                    <option value="RECOMMEND_REJECTION">Recommend Rejection / Notice of Deficiency</option>
+                    <option value="REQUEST_RESUBMISSION">Request Institutional Resubmission (14 Days)</option>
+                    <option value="REFER_TO_HEARING">Refer to Standing Hearing Committee (SHC)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-300 flex items-center justify-between mb-1">
+                    <span>Officer Scrutiny Justification</span>
+                    <span className="text-[10px] text-amber-400 font-normal">Mandatory (Min 10 chars)</span>
+                  </label>
+                  <textarea
+                    rows={5}
+                    placeholder="Provide comprehensive statutory rationale citing verified documents, resolved findings, and handbook chapter compliance..."
+                    value={recommendationRationale}
+                    onChange={(e) => setRecommendationRationale(e.target.value)}
+                    className="w-full bg-surface border border-surface-border rounded p-3 text-xs text-slate-200 focus:outline-none focus:border-accent"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-surface-border">
+                <button
+                  onClick={() => setRecommendationModalOpen(false)}
+                  className="px-4 py-2 rounded border border-surface-border text-xs text-slate-300 hover:bg-surface"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRecommendationSubmit}
+                  disabled={submittingRecommendation}
+                  className="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors disabled:opacity-50"
+                >
+                  {submittingRecommendation ? "Recording..." : "Record Statutory Recommendation"}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </main>

@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 from apps.api.core.config import settings
 from apps.api.db.database import Base, engine
 import apps.api.models  # Ensure all model entities are imported
-from apps.api.routers import auth, applications, documents, audit, rules, extraction, validation, verification
+from apps.api.routers import auth, applications, documents, audit, rules, extraction, validation, verification, review
 
 # Ensure all declared database tables exist
 Base.metadata.create_all(bind=engine)
@@ -47,6 +47,7 @@ app.include_router(rules.router)
 app.include_router(extraction.router)
 app.include_router(validation.router)
 app.include_router(verification.router)
+app.include_router(review.router)
 
 
 @app.get("/api/health")
