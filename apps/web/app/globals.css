@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark-first theme (default per PRD specification) */
+  --background: #0b0d10;
+  --foreground: #f1f5f9;
+  
+  --surface: #0f1217;
+  --surface-card: #12151a;
+  --surface-hover: #171b22;
+  --surface-border: #1f242c;
+
+  --muted: #1e242e;
+  --muted-foreground: #94a3b8;
+
+  /* Restrained accent (Teal/Cyan) */
+  --accent: #0d9488;
+  --accent-foreground: #f0fdfa;
+  --accent-muted: rgba(13, 148, 136, 0.15);
+
+  /* Status Colors */
+  --status-pass: #10b981;
+  --status-fail: #ef4444;
+  --status-warning: #f59e0b;
+  --status-pending: #64748b;
+  --status-not-verified: #8b5cf6;
+  --status-manual-review: #ec4899;
+  --status-simulated: #38bdf8;
+
+  --radius: 0.5rem;
+}
+
+.light {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+
+  --surface: #ffffff;
+  --surface-card: #ffffff;
+  --surface-hover: #f1f5f9;
+  --surface-border: #e2e8f0;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+
+  --accent: #0f766e;
+  --accent-foreground: #ffffff;
+  --accent-muted: rgba(15, 118, 110, 0.1);
+
+  --status-pass: #059669;
+  --status-fail: #dc2626;
+  --status-warning: #d97706;
+  --status-pending: #475569;
+  --status-not-verified: #7c3aed;
+  --status-manual-review: #db2777;
+  --status-simulated: #0284c7;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Accessibility: Visible focus rings */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Monospace font styling */
+code, pre, .font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}

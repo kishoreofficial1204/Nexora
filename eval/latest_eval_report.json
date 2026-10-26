@@ -1,0 +1,98 @@
+{
+  "timestamp": "2026-10-26T16:39:16.672826Z",
+  "assessment_date": "2026-10-26",
+  "evaluation_version": "M0-Baseline",
+  "sample_bundle_count": 9,
+  "total_document_count": 54,
+  "field_metrics": [
+    {
+      "field_type": "institution_name",
+      "sample_size": 9,
+      "exact_match_rate": 1.0,
+      "normalized_match_rate": 1.0,
+      "notes": "Normalized removes trailing punctuation and standardizes abbreviations"
+    },
+    {
+      "field_type": "institute_pid",
+      "sample_size": 9,
+      "exact_match_rate": 1.0,
+      "normalized_match_rate": 1.0,
+      "notes": "Matches AICTE standard regex pattern ^1-[0-9]{10}$"
+    },
+    {
+      "field_type": "intake_capacity",
+      "sample_size": 9,
+      "exact_match_rate": 1.0,
+      "normalized_match_rate": 1.0,
+      "notes": "Numerical parsing of declared approved intake"
+    }
+  ],
+  "ocr_metrics": [],
+  "detection_metrics": [
+    {
+      "category": "missing_document",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_negatives": 8,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "sample_size": 9
+    },
+    {
+      "category": "expired_certificate",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_negatives": 8,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "sample_size": 9
+    },
+    {
+      "category": "intake_consistency",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_negatives": 8,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "sample_size": 9
+    },
+    {
+      "category": "duplicate_sha256",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_negatives": 8,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "sample_size": 9
+    }
+  ],
+  "anomaly_metrics": [
+    {
+      "signal_type": "incremental_pdf_revision",
+      "flagged_count": 1,
+      "known_modified_count": 1,
+      "precision": 1.0,
+      "false_positive_rate": 0.0,
+      "sample_size": 9,
+      "classification": "signal_only_not_proof"
+    },
+    {
+      "signal_type": "near_duplicate_perceptual_hash",
+      "flagged_count": 1,
+      "known_modified_count": 1,
+      "precision": 1.0,
+      "false_positive_rate": 0.0,
+      "sample_size": 9,
+      "classification": "signal_only_not_proof"
+    }
+  ],
+  "summary_markdown": "# VeriScope Evaluation Harness Benchmark Report\n**Run Timestamp:** 2026-10-26T16:39:16.672826Z  \n**Assessment Date:** 2026-10-26  \n**Evaluation Stage:** M0-Baseline  \n**Evaluated Bundles (n):** 9 | **Total Documents (n):** 54  \n\n### 1. Deterministic Detection Metrics\n| Evaluation Category | Sample Size (n) | Precision | Recall | F1 Score | Notes |\n|:--------------------|:----------------|:----------|:-------|:---------|:------|\n| missing_document | n = 9 | 1.00 | 1.00 | 1.00 | Ground truth aligned |\n| expired_certificate | n = 9 | 1.00 | 1.00 | 1.00 | Ground truth aligned |\n| intake_consistency | n = 9 | 1.00 | 1.00 | 1.00 | Ground truth aligned |\n| duplicate_sha256 | n = 9 | 1.00 | 1.00 | 1.00 | Ground truth aligned |\n\n### 2. Anomaly Signal Diagnostics (Signals Only — Never Proof of Fraud)\n| Signal Type | Sample Size (n) | Flagged | Known Modified | Precision | False Positive Rate | Classification |\n|:------------|:----------------|:--------|:---------------|:----------|:--------------------|:---------------|\n| incremental_pdf_revision | n = 9 | 1 | 1 | 1.00 | 0.00 | signal_only_not_proof |\n| near_duplicate_perceptual_hash | n = 9 | 1 | 1 | 1.00 | 0.00 | signal_only_not_proof |\n\n### 3. Field Extraction & Provenance Baseline\n| Field Name | Sample Size (n) | Exact Match Rate | Normalized Match Rate | Specification Note |\n|:-----------|:----------------|:-----------------|:----------------------|:-------------------|\n| institution_name | n = 9 | 1.00 | 1.00 | Normalized removes trailing punctuation and standardizes abbreviations |\n| institute_pid | n = 9 | 1.00 | 1.00 | Matches AICTE standard regex pattern ^1-[0-9]{10}$ |\n| intake_capacity | n = 9 | 1.00 | 1.00 | Numerical parsing of declared approved intake |\n\n> **Important:** All metrics above are computed directly from the synthetic test suite with sample sizes indicated (`n`). No marketing claims or unverified percentages are permitted."
+}

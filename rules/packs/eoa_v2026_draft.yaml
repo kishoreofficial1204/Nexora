@@ -1,0 +1,340 @@
+rule_pack:
+  id: "pack_eoa_ug_2026"
+  name: "Extension of Approval (EoA) - Engineering & Technology Undergraduate"
+  academic_year: "2026-27"
+  version: "2026.1-draft"
+  status: "draft"
+  banner_notice: "UNVERIFIED AGAINST CURRENT HANDBOOK: DRAFT RULES FOR DEMO DECISION SUPPORT"
+  effective_from: "2026-04-01"
+  effective_to: "2027-03-31"
+  approved_by: null
+  source_register_ref: "S1"
+
+checklist_items:
+  - id: "chk_eoa_app"
+    document_type: "doc_eoa_app"
+    title: "Application Form for Extension of Approval (EoA)"
+    is_required: true
+    condition_predicate: null
+    description: "Official online submission application summary signed by Head of Institution."
+  - id: "chk_prev_eoa"
+    document_type: "doc_prev_eoa"
+    title: "AICTE Previous Year Approval Letter"
+    is_required: true
+    condition_predicate: null
+    description: "Previous academic year Extension of Approval letter issued by AICTE."
+  - id: "chk_univ_affil"
+    document_type: "doc_univ_affil"
+    title: "University Affiliation Letter for Academic Year 2026-27"
+    is_required: true
+    condition_predicate: null
+    description: "Affiliation renewal order from the affiliating State Technical University."
+  - id: "chk_fire_safety"
+    document_type: "doc_fire_safety"
+    title: "Fire Safety Certificate (No Objection Certificate)"
+    is_required: true
+    condition_predicate: null
+    description: "Valid NOC from state/district Fire & Rescue Services department."
+  - id: "chk_building_stability"
+    document_type: "doc_building_stability"
+    title: "Building Structural Stability Certificate"
+    is_required: true
+    condition_predicate: null
+    description: "Certificate issued by a certified Government Chartered Structural Engineer."
+  - id: "chk_land_documents"
+    document_type: "doc_land_documents"
+    title: "Land & Building Occupancy Document"
+    is_required: true
+    condition_predicate: null
+    description: "Registered sale/lease deed and latest revenue extract / occupancy certificate."
+  - id: "chk_faculty_cadre"
+    document_type: "doc_faculty_cadre"
+    title: "Faculty Cadre & Ratio Compliance Statement"
+    is_required: true
+    condition_predicate: null
+    description: "Endorsed list of faculty maintaining required student-faculty ratio (1:15/1:20)."
+  - id: "chk_anti_ragging"
+    document_type: "doc_anti_ragging"
+    title: "Constitution of Anti-Ragging Committee & Squad"
+    is_required: true
+    condition_predicate: null
+    description: "Notification constituting anti-ragging squad per AICTE statutory regulations."
+  - id: "chk_infra_photos"
+    document_type: "doc_infra_photos"
+    title: "Geotagged Photographs of Key Campus Infrastructure"
+    is_required: true
+    condition_predicate: null
+    description: "Photographs of classrooms, laboratories, computer centre, and central library."
+  - id: "chk_barrier_free"
+    document_type: "doc_barrier_free"
+    title: "Barrier-Free Environment & Divyangjan Facility Certificate"
+    is_required: false
+    condition_predicate: "optional_facility_audit"
+    description: "Proof of lift/ramps and disabled-friendly restrooms."
+
+rules:
+  - rule_id: "RULE-EOA-001"
+    title: "Mandatory Document Intake Completeness"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Sec 2.1)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence:
+      - "chk_eoa_app"
+      - "chk_prev_eoa"
+      - "chk_univ_affil"
+      - "chk_fire_safety"
+      - "chk_building_stability"
+    expected_fields: []
+    validation_logic:
+      operator: "all_present"
+      target: "checklist_mandatory"
+    severity: "fail"
+    explanation_template: "Required application supporting document '{missing_item}' is missing from submission."
+    reviewer_action: "Request applicant upload missing document or confirm regulatory exemption."
+    is_heuristic: false
+
+  - rule_id: "RULE-EOA-002"
+    title: "Fire Safety Certificate Validity vs Assessment Date"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Sec 2.4.b)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence:
+      - "doc_fire_safety"
+    expected_fields:
+      - "valid_until_date"
+    validation_logic:
+      operator: "date_on_or_after"
+      field: "valid_until_date"
+      compare_to: "assessment_date"
+    severity: "fail"
+    explanation_template: "Fire Safety Certificate validity date ({field_val}) has expired relative to assessment date ({assessment_date})."
+    reviewer_action: "Examine renewal receipt or request updated NOC from Fire Department."
+    is_heuristic: false
+
+  - rule_id: "RULE-EOA-003"
+    title: "Building Structural Safety Certificate Expiry"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Sec 2.4.c)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence:
+      - "doc_building_stability"
+    expected_fields:
+      - "valid_until_date"
+    validation_logic:
+      operator: "date_on_or_after"
+      field: "valid_until_date"
+      compare_to: "assessment_date"
+    severity: "fail"
+    explanation_template: "Building structural stability certificate expired on {field_val}."
+    reviewer_action: "Require submission of fresh stability endorsement from registered structural engineer."
+    is_heuristic: false
+
+  - rule_id: "RULE-EOA-004"
+    title: "Affiliating University Order Validity for Academic Year 2026-27"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Sec 3.1)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence:
+      - "doc_univ_affil"
+    expected_fields:
+      - "academic_year"
+    validation_logic:
+      operator: "equals"
+      field: "academic_year"
+      expected: "2026-27"
+    severity: "fail"
+    explanation_template: "Affiliation letter cites academic year '{field_val}', expected '2026-27'."
+    reviewer_action: "Verify if university has issued provisional affiliation extension."
+    is_heuristic: false
+
+  - rule_id: "RULE-EOA-005"
+    title: "Declared Intake vs Previous Approved Intake Consistency"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Sec 4.2)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence:
+      - "doc_eoa_app"
+      - "doc_prev_eoa"
+    expected_fields:
+      - "intake_capacity"
+    validation_logic:
+      operator: "cross_doc_equals"
+      source_doc: "doc_eoa_app"
+      source_field: "intake_capacity"
+      target_doc: "doc_prev_eoa"
+      target_field: "approved_intake"
+    severity: "warning"
+    explanation_template: "Application claims intake {val_a}, but previous AICTE approval letter specifies {val_b}."
+    reviewer_action: "Review whether institution applied for intake increase under Chapter IV norms."
+    is_heuristic: false
+
+  - rule_id: "RULE-EOA-006"
+    title: "Institution Legal Name Consistency Across Documents"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Sec 1.3)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence:
+      - "doc_eoa_app"
+      - "doc_univ_affil"
+      - "doc_fire_safety"
+    expected_fields:
+      - "institution_name"
+    validation_logic:
+      operator: "cross_doc_fuzzy_match"
+      field: "institution_name"
+      threshold: 0.88
+    severity: "warning"
+    explanation_template: "Institution name variation detected across records: '{val_a}' vs '{val_b}'."
+    reviewer_action: "Verify Gazette notification or trust deed for official name change."
+    is_heuristic: true
+
+  - rule_id: "RULE-EOA-007"
+    title: "AICTE Permanent Institute ID (PID) Consistency"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Sec 1.2)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence:
+      - "doc_eoa_app"
+      - "doc_prev_eoa"
+    expected_fields:
+      - "institute_pid"
+    validation_logic:
+      operator: "cross_doc_equals"
+      field: "institute_pid"
+    severity: "fail"
+    explanation_template: "Permanent Institute ID mismatch: {val_a} on application vs {val_b} on previous approval letter."
+    reviewer_action: "Confirm correct portal application credentials and check for duplicate institutional profiles."
+    is_heuristic: false
+
+  - rule_id: "RULE-EOA-008"
+    title: "Certificate Issue & Expiry Date Temporal Logic"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Sec 2.5)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence:
+      - "doc_fire_safety"
+      - "doc_building_stability"
+    expected_fields:
+      - "issue_date"
+      - "valid_until_date"
+    validation_logic:
+      operator: "date_ordered"
+      start_field: "issue_date"
+      end_field: "valid_until_date"
+    severity: "fail"
+    explanation_template: "Temporal paradox: Document issue date ({issue_date}) is later than validity expiry date ({valid_until_date})."
+    reviewer_action: "Flag for physical verification of original certificate."
+    is_heuristic: false
+
+  - rule_id: "RULE-EOA-009"
+    title: "Exact Duplicate Document Hash Detection"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Technical Appendix B)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence: []
+    expected_fields: []
+    validation_logic:
+      operator: "unique_hashes"
+      hash_type: "sha256"
+    severity: "warning"
+    explanation_template: "Duplicate file detected: Document '{doc_a}' shares identical SHA-256 hash with '{doc_b}'."
+    reviewer_action: "Check whether same PDF was inadvertently uploaded to fulfill two distinct checklist requirements."
+    is_heuristic: false
+
+  - rule_id: "RULE-EOA-010"
+    title: "Infrastructure Evidence Triage & Checklist Completeness"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Appendix 4)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence:
+      - "doc_infra_photos"
+    expected_fields:
+      - "photos_present"
+    validation_logic:
+      operator: "minimum_count"
+      field: "photo_count"
+      min_value: 3
+    severity: "warning"
+    explanation_template: "Submitted infrastructure photo bundle contains {field_val} views, minimum required is 3."
+    reviewer_action: "Triage only. Review physical inspection records if required by procedure."
+    is_heuristic: true

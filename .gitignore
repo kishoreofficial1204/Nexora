@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production build outputs
+.next/
+out/
+build/
+dist/
+
+# Python cache & virtualenv
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.venv/
+env/
+venv/
+.pytest_cache/
+
+# Storage
+storage/documents/*
+!storage/documents/.gitkeep
+
+# OS generated
+.DS_Store
+Thumbs.db

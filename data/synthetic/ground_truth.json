@@ -1,0 +1,237 @@
+{
+  "metadata": {
+    "generated_at": "2026-10-26T21:50:00Z",
+    "assessment_date": "2026-10-26",
+    "rule_pack_id": "pack_eoa_ug_2026",
+    "rule_pack_version": "2026.1-draft",
+    "synthetic_institution": "ABC Institute of Technology",
+    "permanent_id": "1-9876543210",
+    "watermark_policy": "SAMPLE: NOT AN OFFICIAL DOCUMENT"
+  },
+  "bundles": {
+    "bundle_a_clean": {
+      "name": "Clean Benchmark Submission",
+      "description": "All mandatory documents present, valid dates, matching intake and institution identifiers.",
+      "documents": [
+        "doc_eoa_app.pdf",
+        "doc_prev_eoa.pdf",
+        "doc_univ_affil.pdf",
+        "doc_fire_safety.pdf",
+        "doc_building_stability.pdf",
+        "doc_infra_photos.pdf"
+      ],
+      "expected_findings": [],
+      "expected_compliance_status": "pass",
+      "expected_fields": {
+        "doc_eoa_app.pdf": {
+          "institution_name": "ABC Institute of Technology",
+          "institute_pid": "1-9876543210",
+          "intake_capacity": 60,
+          "academic_year": "2026-27"
+        },
+        "doc_prev_eoa.pdf": {
+          "institution_name": "ABC Institute of Technology",
+          "institute_pid": "1-9876543210",
+          "approved_intake": 60,
+          "academic_year": "2025-26"
+        },
+        "doc_univ_affil.pdf": {
+          "institution_name": "ABC Institute of Technology",
+          "academic_year": "2026-27"
+        },
+        "doc_fire_safety.pdf": {
+          "institution_name": "ABC Institute of Technology",
+          "valid_until_date": "2027-01-09"
+        },
+        "doc_building_stability.pdf": {
+          "institution_name": "ABC Institute of Technology",
+          "valid_until_date": "2029-02-14"
+        }
+      }
+    },
+    "bundle_b_missing_doc": {
+      "name": "Missing Affiliation Document",
+      "description": "Required university affiliation order is omitted from the submission bundle.",
+      "documents": [
+        "doc_eoa_app.pdf",
+        "doc_prev_eoa.pdf",
+        "doc_fire_safety.pdf",
+        "doc_building_stability.pdf",
+        "doc_infra_photos.pdf"
+      ],
+      "expected_findings": [
+        {
+          "rule_id": "RULE-EOA-001",
+          "severity": "fail",
+          "finding_type": "missing_document",
+          "missing_item": "chk_univ_affil",
+          "is_heuristic": false
+        }
+      ],
+      "expected_compliance_status": "fail"
+    },
+    "bundle_c_expired_cert": {
+      "name": "Expired Fire Safety Certificate",
+      "description": "Fire Safety NOC validity expired on 2026-03-31, prior to configured assessment date (2026-10-26).",
+      "documents": [
+        "doc_eoa_app.pdf",
+        "doc_prev_eoa.pdf",
+        "doc_univ_affil.pdf",
+        "doc_fire_safety_expired.pdf",
+        "doc_building_stability.pdf",
+        "doc_infra_photos.pdf"
+      ],
+      "expected_findings": [
+        {
+          "rule_id": "RULE-EOA-002",
+          "severity": "fail",
+          "finding_type": "certificate_expired",
+          "document": "doc_fire_safety_expired.pdf",
+          "field": "valid_until_date",
+          "value": "2026-03-31",
+          "is_heuristic": false
+        }
+      ],
+      "expected_compliance_status": "fail"
+    },
+    "bundle_d_intake_mismatch": {
+      "name": "Declared vs Approved Intake Discrepancy",
+      "description": "Application claims approved intake of 60, but uploaded previous AICTE letter specifies 120.",
+      "documents": [
+        "doc_eoa_app.pdf",
+        "doc_prev_eoa_120.pdf",
+        "doc_univ_affil.pdf",
+        "doc_fire_safety.pdf",
+        "doc_building_stability.pdf",
+        "doc_infra_photos.pdf"
+      ],
+      "expected_findings": [
+        {
+          "rule_id": "RULE-EOA-005",
+          "severity": "warning",
+          "finding_type": "intake_mismatch",
+          "evidence_docs": ["doc_eoa_app.pdf", "doc_prev_eoa_120.pdf"],
+          "values": {"application": 60, "approval_letter": 120},
+          "is_heuristic": false
+        }
+      ],
+      "expected_compliance_status": "warning"
+    },
+    "bundle_e_exact_duplicate": {
+      "name": "Exact Duplicate Document Upload",
+      "description": "The exact same fire safety file is uploaded twice under two different document requirements.",
+      "documents": [
+        "doc_eoa_app.pdf",
+        "doc_prev_eoa.pdf",
+        "doc_univ_affil.pdf",
+        "doc_fire_safety.pdf",
+        "doc_building_stability_duplicate.pdf",
+        "doc_infra_photos.pdf"
+      ],
+      "expected_findings": [
+        {
+          "rule_id": "RULE-EOA-009",
+          "severity": "warning",
+          "finding_type": "duplicate_file_hash",
+          "evidence_docs": ["doc_fire_safety.pdf", "doc_building_stability_duplicate.pdf"],
+          "is_heuristic": false
+        }
+      ],
+      "expected_compliance_status": "warning"
+    },
+    "bundle_f_near_duplicate": {
+      "name": "Near Duplicate / Re-scanned Document",
+      "description": "Slightly shifted and recompressed scan of an existing certificate indicating possible duplicate submission.",
+      "documents": [
+        "doc_eoa_app.pdf",
+        "doc_prev_eoa.pdf",
+        "doc_univ_affil.pdf",
+        "doc_fire_safety.pdf",
+        "doc_fire_safety_rescanned.pdf",
+        "doc_building_stability.pdf",
+        "doc_infra_photos.pdf"
+      ],
+      "expected_findings": [
+        {
+          "rule_id": "RULE-EOA-009",
+          "severity": "warning",
+          "finding_type": "near_duplicate_signal",
+          "evidence_docs": ["doc_fire_safety.pdf", "doc_fire_safety_rescanned.pdf"],
+          "is_heuristic": true
+        }
+      ],
+      "expected_compliance_status": "warning"
+    },
+    "bundle_g_modified_pdf": {
+      "name": "Modified PDF Structural Signal",
+      "description": "PDF containing incremental revisions and modified text stream in the intake declaration section.",
+      "documents": [
+        "doc_eoa_app_tampered.pdf",
+        "doc_prev_eoa.pdf",
+        "doc_univ_affil.pdf",
+        "doc_fire_safety.pdf",
+        "doc_building_stability.pdf",
+        "doc_infra_photos.pdf"
+      ],
+      "expected_findings": [
+        {
+          "rule_id": "RULE-ANOMALY-INCREMENTAL-PDF",
+          "severity": "warning",
+          "finding_type": "structural_change_signal",
+          "explanation": "Structural change signal: incremental revision detected after creation. Needs human comparison.",
+          "document": "doc_eoa_app_tampered.pdf",
+          "is_heuristic": true
+        }
+      ],
+      "expected_compliance_status": "warning"
+    },
+    "bundle_h_low_quality_ocr": {
+      "name": "Low Quality Rasterized Scan (OCR Stress)",
+      "description": "Low-DPI rasterized scan with slight rotation causing lower OCR confidence scores.",
+      "documents": [
+        "doc_eoa_app.pdf",
+        "doc_prev_eoa.pdf",
+        "doc_univ_affil_raster_scan.pdf",
+        "doc_fire_safety.pdf",
+        "doc_building_stability.pdf",
+        "doc_infra_photos.pdf"
+      ],
+      "expected_findings": [
+        {
+          "rule_id": "SIGNAL-OCR-CONFIDENCE",
+          "severity": "warning",
+          "finding_type": "low_confidence_extraction",
+          "document": "doc_univ_affil_raster_scan.pdf",
+          "is_heuristic": true
+        }
+      ],
+      "expected_compliance_status": "manual_review_required"
+    },
+    "bundle_i_name_variant": {
+      "name": "Institution Name Variant",
+      "description": "Application says 'ABC Institute of Technology', affiliation letter says 'A.B.C. Inst. of Tech.'",
+      "documents": [
+        "doc_eoa_app.pdf",
+        "doc_prev_eoa.pdf",
+        "doc_univ_affil_abbrev.pdf",
+        "doc_fire_safety.pdf",
+        "doc_building_stability.pdf",
+        "doc_infra_photos.pdf"
+      ],
+      "expected_findings": [
+        {
+          "rule_id": "RULE-EOA-006",
+          "severity": "warning",
+          "finding_type": "name_variation_signal",
+          "evidence_docs": ["doc_eoa_app.pdf", "doc_univ_affil_abbrev.pdf"],
+          "values": {
+            "declared": "ABC Institute of Technology",
+            "evidence": "A.B.C. Inst. of Tech."
+          },
+          "is_heuristic": true
+        }
+      ],
+      "expected_compliance_status": "warning"
+    }
+  }
+}
