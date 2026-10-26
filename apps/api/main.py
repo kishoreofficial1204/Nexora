@@ -8,7 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from apps.api.core.config import settings
-from apps.api.routers import auth, applications, documents, audit, rules
+from apps.api.db.database import Base, engine
+import apps.api.models  # Ensure all model entities are imported
+from apps.api.routers import auth, applications, documents, audit, rules, extraction
+
+# Ensure all declared database tables exist
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=f"{settings.APP_NAME} Regulatory Scrutiny Decision-Support API",
@@ -39,6 +44,7 @@ app.include_router(applications.router)
 app.include_router(documents.router)
 app.include_router(audit.router)
 app.include_router(rules.router)
+app.include_router(extraction.router)
 
 
 @app.get("/api/health")

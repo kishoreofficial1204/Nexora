@@ -1,5 +1,5 @@
 # VeriScope Evaluation Harness Benchmark Report
-**Run Timestamp:** 2026-10-26T17:09:20.560751Z  
+**Run Timestamp:** 2026-10-26T17:33:36.112499Z  
 **Assessment Date:** 2026-10-26  
 **Evaluation Stage:** M0-Baseline  
 **Evaluated Bundles (n):** 9 | **Total Documents (n):** 54  

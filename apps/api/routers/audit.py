@@ -29,8 +29,11 @@ def get_application_audit_trail(
     if not app:
         raise HTTPException(status_code=404, detail="Application not found.")
 
+    doc_ids = [d.id for d in app.documents]
     events = db.query(AuditEvent).filter(
-        (AuditEvent.entity_id == id) | (AuditEvent.entity_type == "document")
+        (AuditEvent.entity_id == id) |
+        (AuditEvent.entity_id.in_(doc_ids)) |
+        (AuditEvent.metadata_json.like(f"%{id}%"))
     ).order_by(desc(AuditEvent.timestamp)).all()
 
     return events
