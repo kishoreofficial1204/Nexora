@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: "Secure, evidence-backed decision support platform for technical education regulatory scrutiny. Turns submitted document bundles into auditable review cases.",
 };
 
+import { AuthProvider } from "@/lib/auth-context";
+
 export default function RootLayout({
   children,
 }: {
@@ -20,7 +22,9 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
