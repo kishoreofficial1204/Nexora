@@ -51,6 +51,35 @@ interface AuditItem {
   current_hash: string;
 }
 
+interface FindingItem {
+  id: string;
+  application_id: string;
+  rule_id: string;
+  rule_version: string;
+  finding_type: string;
+  severity: "fail" | "warning" | "manual_review" | "info";
+  title: string;
+  explanation: string;
+  recommended_action: string;
+  evidence_refs: Array<{
+    document_id?: string;
+    document_name?: string;
+    title?: string;
+    document_type?: string;
+    page?: number;
+    field_name?: string;
+    value?: any;
+    bbox?: number[];
+    note?: string;
+    checklist_id?: string;
+  }>;
+  confidence: number;
+  is_heuristic: boolean;
+  status: "open" | "confirmed" | "dismissed" | "resolved";
+  review_rationale?: string;
+  created_at: string;
+}
+
 interface ApplicationData {
   id: string;
   category: string;
@@ -81,6 +110,8 @@ export default function ApplicationDetailPage() {
   const [application, setApplication] = useState<ApplicationData | null>(null);
   const [auditEvents, setAuditEvents] = useState<AuditItem[]>([]);
   const [verification, setVerification] = useState<AuditVerification | null>(null);
+  const [findings, setFindings] = useState<FindingItem[]>([]);
+  const [validating, setValidating] = useState(false);
   const [activeTab, setActiveTab] = useState<"documents" | "findings" | "compliance" | "verification" | "audit" | "report">("documents");
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -97,10 +128,33 @@ export default function ApplicationDetailPage() {
 
       const verif = await fetchApi<AuditVerification>("/audit/verify");
       setVerification(verif);
+
+      // Load findings
+      try {
+        const found = await fetchApi<FindingItem[]>(`/applications/${id}/findings`);
+        setFindings(found);
+      } catch (fErr) {
+        setFindings([]);
+      }
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRunValidation = async () => {
+    try {
+      setValidating(true);
+      const res = await fetchApi<FindingItem[]>(`/applications/${id}/validate`, {
+        method: "POST"
+      });
+      setFindings(res);
+      await loadData();
+    } catch (err: any) {
+      alert(`Validation check failed: ${err.message}`);
+    } finally {
+      setValidating(false);
     }
   };
 
@@ -204,7 +258,9 @@ export default function ApplicationDetailPage() {
           <div className="mt-6 pt-5 border-t border-surface-border">
             <div className="text-[11px] font-mono uppercase text-muted-foreground mb-3 flex items-center justify-between">
               <span>Pipeline Stage Progression</span>
-              <span className="text-accent">Stage 1 of 5 Verified</span>
+              <span className="text-accent">
+                {findings.length > 0 ? "Stage 3 of 5 (Findings Detected)" : "Stage 3 of 5 In Progress"}
+              </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               <div className="bg-surface p-2.5 rounded border border-emerald-800/60 text-xs">
@@ -214,25 +270,35 @@ export default function ApplicationDetailPage() {
                 <div className="text-[10px] text-muted-foreground mt-0.5">Ingested & Hashed</div>
               </div>
 
-              <div className="bg-surface p-2.5 rounded border border-surface-border text-xs opacity-70">
-                <div className="text-slate-300 font-semibold flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-muted-foreground" /> 2. Text & OCR
+              <div className="bg-surface p-2.5 rounded border border-emerald-800/60 text-xs">
+                <div className="text-emerald-400 font-semibold flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> 2. OCR / Facts
                 </div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">M2 Extraction</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">M2 Extracted</div>
+              </div>
+
+              <div className={`bg-surface p-2.5 rounded border text-xs ${
+                findings.some(f => f.severity === "fail") 
+                  ? "border-rose-800/80 bg-rose-950/20" 
+                  : findings.length > 0 
+                  ? "border-amber-800/80 bg-amber-950/20" 
+                  : "border-emerald-800/60"
+              }`}>
+                <div className={`font-semibold flex items-center gap-1.5 ${
+                  findings.some(f => f.severity === "fail") ? "text-rose-400" : "text-amber-400"
+                }`}>
+                  <AlertTriangle className="w-3.5 h-3.5" /> 3. Rule Checks
+                </div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">
+                  {findings.length} Finding{findings.length === 1 ? "" : "s"}
+                </div>
               </div>
 
               <div className="bg-surface p-2.5 rounded border border-surface-border text-xs opacity-70">
                 <div className="text-slate-300 font-semibold flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-muted-foreground" /> 3. Rule Checks
+                  <Clock className="w-3.5 h-3.5 text-muted-foreground" /> 4. Verification
                 </div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">M3 Validation</div>
-              </div>
-
-              <div className="bg-surface p-2.5 rounded border border-surface-border text-xs opacity-70">
-                <div className="text-slate-300 font-semibold flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-muted-foreground" /> 4. Discrepancies
-                </div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">M3 Consistency</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">M4 Sources</div>
               </div>
 
               <div className="bg-surface p-2.5 rounded border border-surface-border text-xs opacity-70">
@@ -260,6 +326,25 @@ export default function ApplicationDetailPage() {
           </button>
 
           <button
+            onClick={() => setActiveTab("findings")}
+            className={`px-4 py-2.5 border-b-2 transition-colors flex items-center gap-2 ${
+              activeTab === "findings"
+                ? "border-accent text-accent font-semibold"
+                : "border-transparent text-muted-foreground hover:text-slate-200"
+            }`}
+          >
+            <AlertTriangle className="w-3.5 h-3.5" />
+            <span>Findings ({findings.length})</span>
+            {findings.length > 0 && (
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                findings.some(f => f.severity === "fail") ? "bg-rose-900 text-rose-200" : "bg-amber-900 text-amber-200"
+              }`}>
+                {findings.length}
+              </span>
+            )}
+          </button>
+
+          <button
             onClick={() => setActiveTab("audit")}
             className={`px-4 py-2.5 border-b-2 transition-colors flex items-center gap-2 ${
               activeTab === "audit"
@@ -269,18 +354,6 @@ export default function ApplicationDetailPage() {
           >
             <History className="w-3.5 h-3.5" />
             <span>Audit Trail ({auditEvents.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("findings")}
-            className={`px-4 py-2.5 border-b-2 transition-colors flex items-center gap-2 ${
-              activeTab === "findings"
-                ? "border-accent text-accent font-semibold"
-                : "border-transparent text-muted-foreground hover:text-slate-200"
-            }`}
-          >
-            <AlertTriangle className="w-3.5 h-3.5" />
-            <span>Findings (M3)</span>
           </button>
 
           <button
@@ -461,8 +534,149 @@ export default function ApplicationDetailPage() {
           </div>
         )}
 
+        {/* Tab 3: Findings & Anomaly Signals (M3) */}
+        {activeTab === "findings" && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-200">
+                  Scrutiny Findings & Anomaly Signals
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Deterministic rule evaluations against handbook draft norms and heuristic anomaly alerts.
+                </p>
+              </div>
+
+              <button
+                onClick={handleRunValidation}
+                disabled={validating}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-accent text-accent-foreground font-semibold text-xs hover:bg-teal-600 transition-colors disabled:opacity-50"
+              >
+                <Cpu className={`w-3.5 h-3.5 ${validating ? "animate-spin" : ""}`} />
+                <span>{validating ? "Running Rule Pack..." : "Re-run Validation & Signals"}</span>
+              </button>
+            </div>
+
+            {/* Decision Support Advisory Banner */}
+            <div className="p-3.5 rounded-lg bg-surface-card border border-surface-border text-xs flex items-start gap-3">
+              <ShieldCheck className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <span className="font-semibold text-slate-200">
+                  DECISION-SUPPORT NOTICE (Non-Negotiable Principles 1 & 2):
+                </span>
+                <p className="text-muted-foreground text-[11px] leading-relaxed">
+                  Findings generated below are advisory signals designed to support scrutiny officers. They do not constitute an automated approval or rejection, nor legal proof of fraud. Scrutiny officers retain statutory discretion to confirm, dismiss, or request clarification.
+                </p>
+              </div>
+            </div>
+
+            {/* Findings List */}
+            {findings.length === 0 ? (
+              <div className="bg-surface-card p-12 rounded-lg border border-surface-border text-center space-y-3">
+                <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
+                <h4 className="font-semibold text-slate-200 text-sm">
+                  Zero Compliance Deficiencies or Anomaly Signals
+                </h4>
+                <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                  All automated checklist items, certificate expiration boundaries, and cross-document intake assertions pass without contradiction.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {findings.map((f) => (
+                  <div
+                    key={f.id}
+                    className={`p-4 rounded-lg border bg-surface-card space-y-3 ${
+                      f.severity === "fail"
+                        ? "border-rose-800/80"
+                        : f.severity === "warning"
+                        ? "border-amber-800/80"
+                        : "border-purple-800/80"
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <StatusBadge status={f.severity} />
+                        <span className="font-mono text-[11px] text-slate-400 bg-surface px-2 py-0.5 rounded border border-surface-border">
+                          {f.rule_id} ({f.rule_version})
+                        </span>
+                        {f.is_heuristic ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-950/80 text-amber-300 border border-amber-800">
+                            HEURISTIC ANOMALY SIGNAL (Advisory Only)
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-blue-950/80 text-blue-300 border border-blue-800">
+                            DETERMINISTIC COMPLIANCE RULE
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="text-[11px] font-mono text-muted-foreground">
+                        Confidence: {(f.confidence * 100).toFixed(0)}%
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="text-sm font-semibold text-slate-100">{f.title}</h4>
+                      <p className="text-xs text-slate-300 mt-1 leading-relaxed">{f.explanation}</p>
+                    </div>
+
+                    {f.recommended_action && (
+                      <div className="bg-surface p-2.5 rounded border border-surface-border text-xs text-slate-300">
+                        <span className="font-semibold text-accent text-[11px] block mb-0.5">
+                          Recommended Scrutiny Action:
+                        </span>
+                        {f.recommended_action}
+                      </div>
+                    )}
+
+                    {/* Evidence Provenance (Cross-Document and Single Document) */}
+                    {f.evidence_refs && f.evidence_refs.length > 0 && (
+                      <div className="pt-2 border-t border-surface-border/60">
+                        <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1.5">
+                          Referenced Evidence & Provenance
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {f.evidence_refs.map((ref, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-surface p-2.5 rounded border border-surface-border text-[11px] space-y-1.5 flex flex-col justify-between"
+                            >
+                              <div>
+                                <div className="font-semibold text-slate-200">
+                                  {ref.document_name || ref.title || ref.document_type || "Evidence Slot"}
+                                </div>
+                                <div className="text-muted-foreground text-[10px] font-mono">
+                                  {ref.field_name && <span>Field: {ref.field_name} · </span>}
+                                  {ref.value !== undefined && <span>Value: "{String(ref.value)}" · </span>}
+                                  {ref.page && <span>Page: {ref.page}</span>}
+                                  {ref.note && <span>Note: {ref.note}</span>}
+                                </div>
+                              </div>
+
+                              {ref.document_id && (
+                                <Link
+                                  href={`/applications/${application.id}/workbench?doc=${ref.document_id}&page=${ref.page || 1}`}
+                                  className="inline-flex items-center gap-1 text-[11px] text-accent hover:underline mt-1 pt-1 border-t border-surface-border/40 font-medium"
+                                >
+                                  <Eye className="w-3 h-3" />
+                                  <span>Inspect Bounding Box in Workbench</span>
+                                </Link>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Placeholder tab views for subsequent milestones */}
-        {activeTab !== "documents" && activeTab !== "audit" && (
+        {activeTab !== "documents" && activeTab !== "audit" && activeTab !== "findings" && (
           <div className="bg-surface-card p-12 rounded-lg border border-surface-border text-center space-y-3">
             <Layers className="w-8 h-8 text-accent mx-auto" />
             <h4 className="font-semibold text-slate-200 text-sm">

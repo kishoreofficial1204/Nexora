@@ -44,20 +44,20 @@ checklist_items:
   - id: "chk_land_documents"
     document_type: "doc_land_documents"
     title: "Land & Building Occupancy Document"
-    is_required: true
-    condition_predicate: null
+    is_required: false
+    condition_predicate: "on_site_scrutiny"
     description: "Registered sale/lease deed and latest revenue extract / occupancy certificate."
   - id: "chk_faculty_cadre"
     document_type: "doc_faculty_cadre"
     title: "Faculty Cadre & Ratio Compliance Statement"
-    is_required: true
-    condition_predicate: null
+    is_required: false
+    condition_predicate: "on_site_scrutiny"
     description: "Endorsed list of faculty maintaining required student-faculty ratio (1:15/1:20)."
   - id: "chk_anti_ragging"
     document_type: "doc_anti_ragging"
     title: "Constitution of Anti-Ragging Committee & Squad"
-    is_required: true
-    condition_predicate: null
+    is_required: false
+    condition_predicate: "annual_compliance_cycle"
     description: "Notification constituting anti-ragging squad per AICTE statutory regulations."
   - id: "chk_infra_photos"
     document_type: "doc_infra_photos"
