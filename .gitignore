@@ -20,9 +20,11 @@ env/
 venv/
 .pytest_cache/
 
-# Storage
+# Storage & DB
 storage/documents/*
 !storage/documents/.gitkeep
+*.db
+
 
 # OS generated
 .DS_Store
