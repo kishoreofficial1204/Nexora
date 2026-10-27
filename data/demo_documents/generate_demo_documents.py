@@ -51,9 +51,9 @@ def draw_page_frame(c: canvas.Canvas, doc_title: str, page_no: int, page_count: 
 
     c.setFont("Helvetica-Bold", 7)
     c.setFillColor(colors.HexColor("#64748B"))
-    c.drawString(LEFT, PAGE_HEIGHT - 28, "SYNTHETIC DEMO ARTIFACT · NOT AN OFFICIAL RECORD")
-    c.drawString(LEFT, 30, "Generated for the VeriScope SIH walkthrough · fictional institution")
-    c.drawRightString(RIGHT, 30, f"{doc_title} · Page {page_no} of {page_count}")
+    c.drawString(LEFT, PAGE_HEIGHT - 28, "SYNTHETIC DEMO ARTIFACT | NOT AN OFFICIAL RECORD")
+    c.drawString(LEFT, 30, "Generated for the VeriScope SIH walkthrough | fictional institution")
+    c.drawRightString(RIGHT, 30, f"{doc_title} | Page {page_no} of {page_count}")
 
     c.setFillColor(colors.HexColor("#0F172A"))
 
@@ -101,7 +101,7 @@ def eoa_application() -> None:
     for page in (1, 2):
         draw_page_frame(c, "EoA Application", page, 2)
         text(c, LEFT, TOP - 10, "ALL INDIA COUNCIL FOR TECHNICAL EDUCATION", 13, bold=True)
-        text(c, LEFT, TOP - 28, "Extension of Approval (EoA) Application Summary · AY 2026-27", 10)
+        text(c, LEFT, TOP - 28, "Extension of Approval (EoA) Application Summary | AY 2026-27", 10)
         c.setStrokeColor(colors.HexColor("#94A3B8"))
         c.line(LEFT, TOP - 38, RIGHT, TOP - 38)
 
@@ -129,7 +129,7 @@ def eoa_application() -> None:
                     "The institution will produce originals during physical verification, if requested.",
                 ]
             ):
-                text(c, LEFT, TOP - 312 - (idx * 18), f"•  {line}", 8)
+                text(c, LEFT, TOP - 312 - (idx * 18), f"-  {line}", 8)
 
             section(c, TOP - 390, "Authorised signatory")
             text(c, LEFT, TOP - 414, "Name: Dr. Meera Raman", 9)
@@ -156,7 +156,7 @@ def eoa_application() -> None:
             text(c, LEFT, TOP - 342, "Signature: ______________________________", 9)
             text(c, LEFT, TOP - 366, "Date: 2026-09-15", 9)
 
-        footer_note(c, BOTTOM + 24, "Document type: doc_eoa_app · applicant declaration and intake schedule")
+        footer_note(c, BOTTOM + 24, "Document type: doc_eoa_app | applicant declaration and intake schedule")
         c.showPage()
     save(c, "doc_eoa_app.pdf")
 
@@ -166,7 +166,7 @@ def previous_eoa() -> None:
     for page in (1, 2):
         draw_page_frame(c, "Previous Approval", page, 2)
         text(c, LEFT, TOP - 10, "ALL INDIA COUNCIL FOR TECHNICAL EDUCATION", 13, bold=True)
-        text(c, LEFT, TOP - 28, "Approval Order · Extension of Approval (AY 2025-26)", 10)
+        text(c, LEFT, TOP - 28, "Approval Order | Extension of Approval (AY 2025-26)", 10)
         c.line(LEFT, TOP - 38, RIGHT, TOP - 38)
 
         if page == 1:
@@ -202,7 +202,7 @@ def previous_eoa() -> None:
             text(c, LEFT, TOP - 256, "Regional Officer, AICTE Eastern Regional Office", 9)
             text(c, LEFT, TOP - 274, "Nelson Mandela Marg, Vasant Kunj, New Delhi-110070", 9)
 
-        footer_note(c, BOTTOM + 24, "Document type: doc_prev_eoa · previous-year approval order")
+        footer_note(c, BOTTOM + 24, "Document type: doc_prev_eoa | previous-year approval order")
         c.showPage()
     save(c, "doc_prev_eoa.pdf")
 
@@ -212,7 +212,7 @@ def university_affiliation() -> None:
     for page in (1, 2):
         draw_page_frame(c, "University Affiliation", page, 2)
         text(c, LEFT, TOP - 10, "STATE TECHNICAL UNIVERSITY", 13, bold=True)
-        text(c, LEFT, TOP - 28, "Office of the Registrar · Affiliation Section", 9)
+        text(c, LEFT, TOP - 28, "Office of the Registrar | Affiliation Section", 9)
         c.line(LEFT, TOP - 38, RIGHT, TOP - 38)
 
         if page == 1:
@@ -242,7 +242,7 @@ def university_affiliation() -> None:
             text(c, LEFT, TOP - 242, "Registrar", 9)
             text(c, LEFT, TOP - 260, "Date: 2026-06-12", 9)
 
-        footer_note(c, BOTTOM + 24, "Document type: doc_univ_affil · provisional affiliation order")
+        footer_note(c, BOTTOM + 24, "Document type: doc_univ_affil | provisional affiliation order")
         c.showPage()
     save(c, "doc_univ_affil.pdf")
 
@@ -252,7 +252,7 @@ def fire_safety() -> None:
     for page in (1, 2):
         draw_page_frame(c, "Fire Safety NOC", page, 2)
         text(c, LEFT, TOP - 10, "STATE FIRE AND RESCUE SERVICES", 13, bold=True)
-        text(c, LEFT, TOP - 28, "No Objection Certificate · Fire Safety", 10)
+        text(c, LEFT, TOP - 28, "No Objection Certificate | Fire Safety", 10)
         c.line(LEFT, TOP - 38, RIGHT, TOP - 38)
 
         if page == 1:
@@ -278,12 +278,12 @@ def fire_safety() -> None:
                     "The campus fire alarm and hydrant systems were tested during the inspection.",
                 ]
             ):
-                text(c, LEFT, TOP - 94 - (idx * 24), f"•  {line}", 9)
+                text(c, LEFT, TOP - 94 - (idx * 24), f"-  {line}", 9)
 
             text(c, LEFT, TOP - 200, "Authorised Officer: R. K. Sharma", 9)
             text(c, LEFT, TOP - 220, "Designation: Divisional Fire Officer", 9)
 
-        footer_note(c, BOTTOM + 24, "Document type: doc_fire_safety · synthetic NOC for demo use")
+        footer_note(c, BOTTOM + 24, "Document type: doc_fire_safety | synthetic NOC for demo use")
         c.showPage()
     save(c, "doc_fire_safety.pdf")
 
@@ -320,12 +320,12 @@ def building_stability() -> None:
                     "Non-destructive testing was not part of this synthetic demonstration record.",
                 ]
             ):
-                text(c, LEFT, TOP - 94 - (idx * 24), f"•  {line}", 9)
+                text(c, LEFT, TOP - 94 - (idx * 24), f"-  {line}", 9)
 
             text(c, LEFT, TOP - 210, "This is a fictional certificate generated for the VeriScope demo.", 9)
             text(c, LEFT, TOP - 232, "It is not issued by any government authority.", 9)
 
-        footer_note(c, BOTTOM + 24, "Document type: doc_building_stability · synthetic structural certificate")
+        footer_note(c, BOTTOM + 24, "Document type: doc_building_stability | synthetic structural certificate")
         c.showPage()
     save(c, "doc_building_stability.pdf")
 
@@ -343,7 +343,7 @@ def infrastructure_photos() -> None:
     for page in (1, 2, 3):
         draw_page_frame(c, "Infrastructure Photos", page, 3)
         text(c, LEFT, TOP - 10, "GEOTAGGED INFRASTRUCTURE PHOTOGRAPHS", 13, bold=True)
-        text(c, LEFT, TOP - 28, "Synthetic campus evidence bundle · ABC Institute of Technology", 9)
+        text(c, LEFT, TOP - 28, "Synthetic campus evidence bundle | ABC Institute of Technology", 9)
         c.line(LEFT, TOP - 38, RIGHT, TOP - 38)
 
         if page == 1:
@@ -366,11 +366,11 @@ def infrastructure_photos() -> None:
                 c,
                 LEFT,
                 top - 232,
-                f"LAT: 12.97{16 + idx}  LONG: 77.59{46 + idx}  ·  Captured: 2026-08-14 10:{20 + idx}:00",
+                f"LAT: 12.97{16 + idx}  LONG: 77.59{46 + idx}  |  Captured: 2026-08-14 10:{20 + idx}:00",
                 7.5,
             )
 
-        footer_note(c, BOTTOM + 24, "Document type: doc_infra_photos · 6 geotagged views")
+        footer_note(c, BOTTOM + 24, "Document type: doc_infra_photos | 6 geotagged views")
         c.showPage()
     save(c, "doc_infra_photos.pdf")
 
@@ -402,7 +402,7 @@ def simple_document(
             text(c, LEFT, TOP - 160, "Authorised signatory: ______________________________", 9)
             text(c, LEFT, TOP - 184, "Date: 2026-08-20", 9)
 
-        footer_note(c, BOTTOM + 24, f"Document type: {filename.replace('.pdf', '')} · synthetic demo record")
+        footer_note(c, BOTTOM + 24, f"Document type: {filename.replace('.pdf', '')} | synthetic demo record")
         c.showPage()
     save(c, filename)
 

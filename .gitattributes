@@ -1,0 +1,5 @@
+# Keep binary evidence and generated demo artifacts byte-for-byte stable.
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
