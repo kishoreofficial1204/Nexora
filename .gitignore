@@ -26,6 +26,12 @@ storage/documents/*
 *.db
 
 
-# OS generated
+# OS & Browser Temporary
 .DS_Store
 Thumbs.db
+.chrome_tmp/
+test_shot.png
+eval_shot.png
+findings_shot.png
+frame_test.png
+
