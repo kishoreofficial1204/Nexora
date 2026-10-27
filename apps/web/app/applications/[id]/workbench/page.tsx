@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { NavHeader } from "@/components/layout/nav-header";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { fetchApi } from "@/lib/api";
+import { fetchApi, fetchBlob, openApiFile } from "@/lib/api";
 
 interface ExtractedField {
   id: string;
@@ -76,9 +76,15 @@ export default function EvidenceWorkbenchPage() {
   // Viewer State (Primary)
   const [currentPage, setCurrentPage] = useState(1);
   const [zoomLevel, setZoomLevel] = useState(100);
+  const [pageImageUrl, setPageImageUrl] = useState<string | null>(null);
+  const [pageImageLoading, setPageImageLoading] = useState(false);
+  const [pageImageError, setPageImageError] = useState<string | null>(null);
 
   // Viewer State (Compare Pane)
   const [comparePage, setComparePage] = useState(1);
+  const [compareImageUrl, setCompareImageUrl] = useState<string | null>(null);
+  const [compareImageLoading, setCompareImageLoading] = useState(false);
+  const [compareImageError, setCompareImageError] = useState<string | null>(null);
 
   // Extracted Fields
   const [fields, setFields] = useState<ExtractedField[]>([]);
@@ -132,6 +138,72 @@ export default function EvidenceWorkbenchPage() {
       loadApplication();
     }
   }, [id]);
+
+  // The page image endpoint is authenticated. Fetch it with the bearer token and
+  // hand the browser a blob URL instead of pointing <img> at a protected URL.
+  useEffect(() => {
+    if (!selectedDocId) {
+      setPageImageUrl(null);
+      setPageImageError(null);
+      return;
+    }
+
+    let cancelled = false;
+    let objectUrl: string | null = null;
+    setPageImageLoading(true);
+    setPageImageError(null);
+    setPageImageUrl(null);
+
+    fetchBlob(`/documents/${selectedDocId}/pages/${currentPage}/image?dpi=140`)
+      .then((blob) => {
+        if (cancelled) return;
+        objectUrl = URL.createObjectURL(blob);
+        setPageImageUrl(objectUrl);
+      })
+      .catch((err: Error) => {
+        if (!cancelled) setPageImageError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setPageImageLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [selectedDocId, currentPage]);
+
+  useEffect(() => {
+    if (!compareMode || !compareDocId) {
+      setCompareImageUrl(null);
+      setCompareImageError(null);
+      return;
+    }
+
+    let cancelled = false;
+    let objectUrl: string | null = null;
+    setCompareImageLoading(true);
+    setCompareImageError(null);
+    setCompareImageUrl(null);
+
+    fetchBlob(`/documents/${compareDocId}/pages/${comparePage}/image?dpi=120`)
+      .then((blob) => {
+        if (cancelled) return;
+        objectUrl = URL.createObjectURL(blob);
+        setCompareImageUrl(objectUrl);
+      })
+      .catch((err: Error) => {
+        if (!cancelled) setCompareImageError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setCompareImageLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [compareMode, compareDocId, comparePage]);
 
   const handleSelectDoc = async (docId: string) => {
     setSelectedDocId(docId);
@@ -386,6 +458,20 @@ export default function EvidenceWorkbenchPage() {
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
+              <button
+                onClick={() => {
+                  if (!selectedDocId) return;
+                  openApiFile(`/documents/${selectedDocId}/file`).catch((err: Error) =>
+                    alert(`Could not open PDF: ${err.message}`)
+                  );
+                }}
+                disabled={!selectedDocId}
+                className="ml-1 inline-flex items-center gap-1 rounded border border-surface-border bg-surface-card px-2 py-1 text-[11px] text-slate-300 hover:text-white disabled:opacity-40"
+                title="Open the original PDF in a new tab"
+              >
+                <ExternalLink className="w-3 h-3" />
+                PDF
+              </button>
             </div>
           </div>
 
@@ -399,12 +485,23 @@ export default function EvidenceWorkbenchPage() {
                   height: `${(792 * zoomLevel) / 100}px`,
                 }}
               >
-                {/* Visual Page Image Rendered directly by Backend PyMuPDF Engine */}
-                <img
-                  src={`http://127.0.0.1:8000/api/documents/${selectedDocId}/pages/${currentPage}/image?dpi=140`}
-                  alt={`Page ${currentPage}`}
-                  className="w-full h-full object-contain pointer-events-none select-none"
-                />
+                {/* Visual page image rendered by the backend PyMuPDF engine. The
+                    authenticated response is converted to a blob URL above. */}
+                {pageImageUrl ? (
+                  <img
+                    src={pageImageUrl}
+                    alt={`Page ${currentPage}`}
+                    className="w-full h-full object-contain pointer-events-none select-none"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center px-8 text-center text-xs text-slate-500">
+                    {pageImageLoading
+                      ? "Rendering page…"
+                      : pageImageError
+                        ? `Could not render this page: ${pageImageError}`
+                        : "No page image available."}
+                  </div>
+                )}
 
                 {/* Overlaid Bounding Box Highlights for Extracted Fields on this page */}
                 <svg
@@ -487,11 +584,21 @@ export default function EvidenceWorkbenchPage() {
             <div className="flex-1 overflow-auto p-4 flex justify-center items-start bg-slate-950/70">
               {compareDocId && (
                 <div className="bg-white shadow-xl relative" style={{ width: "100%", maxWidth: "420px" }}>
-                  <img
-                    src={`http://127.0.0.1:8000/api/documents/${compareDocId}/pages/${comparePage}/image?dpi=120`}
-                    alt="Compare Reference"
-                    className="w-full object-contain pointer-events-none"
-                  />
+                  {compareImageUrl ? (
+                    <img
+                      src={compareImageUrl}
+                      alt="Compare Reference"
+                      className="w-full object-contain pointer-events-none"
+                    />
+                  ) : (
+                    <div className="flex min-h-[320px] items-center justify-center px-6 text-center text-xs text-slate-500">
+                      {compareImageLoading
+                        ? "Rendering compare page…"
+                        : compareImageError
+                          ? `Could not render compare page: ${compareImageError}`
+                          : "No page image available."}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

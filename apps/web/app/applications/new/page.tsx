@@ -17,6 +17,7 @@ import {
 import { NavHeader } from "@/components/layout/nav-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { fetchApi } from "@/lib/api";
+import { loadDemoDocumentFiles } from "@/lib/demo-documents";
 
 const todayIso = new Date().toISOString().slice(0, 10);
 const currentYear = new Date().getFullYear();
@@ -56,6 +57,9 @@ export default function NewApplicationPage() {
 
   // Document Uploads
   const [filesByDocType, setFilesByDocType] = useState<Record<string, File>>({});
+  const [demoDocsLoading, setDemoDocsLoading] = useState(false);
+  const [demoDocsError, setDemoDocsError] = useState<string | null>(null);
+  const [demoDocsLoaded, setDemoDocsLoaded] = useState(false);
 
   useEffect(() => {
     async function loadRules() {
@@ -70,6 +74,58 @@ export default function NewApplicationPage() {
     }
     loadRules();
   }, []);
+
+  // The demo should be usable without hunting for PDFs on disk. Once the
+  // checklist is available, pre-attach the generated synthetic packet. A
+  // presenter can still remove or replace any slot before submitting.
+  useEffect(() => {
+    if (!rulePackData) return;
+
+    let cancelled = false;
+    const documentTypes = rulePackData.checklist_items.map((item) => item.document_type);
+    setDemoDocsLoading(true);
+    setDemoDocsError(null);
+
+    loadDemoDocumentFiles(documentTypes)
+      .then((entries) => {
+        if (cancelled) return;
+        setFilesByDocType((current) => {
+          const next = { ...current };
+          for (const [documentType, file] of entries) {
+            if (!next[documentType]) next[documentType] = file;
+          }
+          return next;
+        });
+        setDemoDocsLoaded(true);
+      })
+      .catch((err: Error) => {
+        if (!cancelled) setDemoDocsError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setDemoDocsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [rulePackData]);
+
+  const reloadDemoDocuments = async () => {
+    if (!rulePackData) return;
+    setDemoDocsLoading(true);
+    setDemoDocsError(null);
+    try {
+      const entries = await loadDemoDocumentFiles(
+        rulePackData.checklist_items.map((item) => item.document_type)
+      );
+      setFilesByDocType(Object.fromEntries(entries));
+      setDemoDocsLoaded(true);
+    } catch (err: any) {
+      setDemoDocsError(err.message || "Could not load the demo PDFs.");
+    } finally {
+      setDemoDocsLoading(false);
+    }
+  };
 
   const handleFileChange = (docType: string, file: File | null) => {
     if (!file) {
@@ -263,6 +319,43 @@ export default function NewApplicationPage() {
               <span className="text-xs font-mono text-muted-foreground">
                 {Object.keys(filesByDocType).length} / {rulePackData?.checklist_items.length || 0} Attached
               </span>
+            </div>
+
+            <div className="flex flex-col gap-2 rounded-md border border-surface-border bg-surface px-3.5 py-3 text-xs sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div className="font-semibold text-foreground">
+                  {demoDocsLoading
+                    ? "Loading demo PDFs…"
+                    : demoDocsLoaded
+                      ? "Demo sample PDFs pre-attached"
+                      : "Demo sample PDFs unavailable"}
+                </div>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
+                  Synthetic, watermarked documents are attached by default for a faster walkthrough.
+                  Replace or remove any slot before creating the case.
+                </p>
+                {demoDocsError && (
+                  <p className="mt-1 text-[11px] text-rose-400">{demoDocsError}</p>
+                )}
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  type="button"
+                  onClick={reloadDemoDocuments}
+                  disabled={demoDocsLoading}
+                  className="rounded border border-surface-border bg-surface-card px-2.5 py-1.5 text-[11px] font-medium text-slate-200 hover:bg-surface-hover hover:text-white disabled:opacity-50"
+                >
+                  Reload samples
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilesByDocType({})}
+                  disabled={demoDocsLoading || Object.keys(filesByDocType).length === 0}
+                  className="rounded border border-surface-border bg-surface-card px-2.5 py-1.5 text-[11px] font-medium text-slate-300 hover:bg-surface-hover hover:text-white disabled:opacity-50"
+                >
+                  Clear all
+                </button>
+              </div>
             </div>
 
             <div className="space-y-3 pt-2">
