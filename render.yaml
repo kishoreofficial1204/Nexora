@@ -22,4 +22,6 @@ services:
     rootDir: apps/web
     buildCommand: npm install && npm run build
     startCommand: npx next start -p $PORT
-
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://nexora-api-6j17.onrender.com/api
