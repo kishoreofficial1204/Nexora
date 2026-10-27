@@ -26,6 +26,7 @@ class FindingStatus:
     DISMISSED = "dismissed"
     CLARIFICATION_REQUESTED = "clarification_requested"
     ESCALATED = "escalated"
+    RESOLVED = "resolved"
 
 
 class Finding(Base):

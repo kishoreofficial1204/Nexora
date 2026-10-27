@@ -140,3 +140,22 @@ def test_seed_demo_bundle_and_audit_hash_chain():
     assert verification["verified"] is True
     assert verification["status"] == "cryptographically_verified"
     assert verification["chain_length"] > 0
+
+
+def test_audit_chain_detects_broken_prev_hash_linkage():
+    """A tampered prev_hash must break verification even if current_hash is valid."""
+    db = SessionLocal()
+    event = db.query(AuditEvent).order_by(AuditEvent.timestamp.asc()).first()
+    assert event is not None, "Expected seeded audit events before running this test."
+    original_prev_hash = event.prev_hash
+    try:
+        event.prev_hash = "f" * 64
+        db.commit()
+        result = verify_audit_chain(db)
+        assert result["verified"] is False
+        assert result["status"] == "broken_link"
+        assert result["tampered_at_event_id"] == event.id
+    finally:
+        event.prev_hash = original_prev_hash
+        db.commit()
+        db.close()

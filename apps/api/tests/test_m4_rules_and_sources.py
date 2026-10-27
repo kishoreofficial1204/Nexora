@@ -19,6 +19,15 @@ from apps.api.services.mock_issuer import SIMULATED_BANNER
 client = TestClient(app)
 
 
+def _reviewer_headers() -> dict:
+    res = client.post(
+        "/api/auth/login",
+        json={"email": "reviewer@aicte-demo.in", "password": "DemoPass123!"},
+    )
+    assert res.status_code == 200, f"Login failed: {res.text}"
+    return {"Authorization": f"Bearer {res.json()['access_token']}"}
+
+
 def test_rule_pack_citation_integrity():
     """Every rule in the active pack must cite an official source document and section."""
     pack = get_default_rule_pack()
@@ -41,10 +50,12 @@ def test_rule_pack_draft_banner_notice():
 def test_mock_issuer_all_response_modes():
     """MockIssuerConnector must faithfully support all 5 simulation modes with mandatory badge."""
     modes = ["match", "mismatch", "not_found", "timeout", "service_down"]
+    headers = _reviewer_headers()
 
     for mode in modes:
         res = client.post(
             "/api/verification/query",
+            headers=headers,
             json={
                 "authority_id": "fire_department",
                 "query_payload": {
@@ -80,7 +91,7 @@ def test_mock_issuer_all_response_modes():
 
 def test_supported_external_authorities_list():
     """Listing external authorities must return supported licensing bodies with simulated notice."""
-    res = client.get("/api/verification/authorities")
+    res = client.get("/api/verification/authorities", headers=_reviewer_headers())
     assert res.status_code == 200
     data = res.json()
     assert data["badge"] == SIMULATED_BANNER

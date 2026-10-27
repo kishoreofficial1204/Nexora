@@ -98,6 +98,27 @@ class MockIssuerConnector:
                 "note": "SIMULATED: Negative registry lookup simulated."
             }
 
+        if mode == "expired":
+            time.sleep(min(simulated_delay_ms / 1000.0, 0.2))
+            latency = int((time.time() - start_time) * 1000)
+            return {
+                "authority_id": authority_id,
+                "authority_name": authority_name,
+                "status": "expired",
+                "badge": SIMULATED_BANNER,
+                "latency_ms": latency,
+                "timestamp": datetime.utcnow().isoformat() + "Z",
+                "query_sent": query_payload,
+                "response_payload": {
+                    "registry_status": "EXPIRED",
+                    "expiry_date_on_file": "2026-03-31",
+                    "query_claimed_expiry": query_payload.get("valid_until_date"),
+                    "discrepancy": "Issuer master record shows this credential is expired.",
+                },
+                "error_message": "Credential is expired in the issuer master record.",
+                "note": "SIMULATED: Expired credential response simulated for verification workflows.",
+            }
+
         if mode == "mismatch":
             time.sleep(min(simulated_delay_ms / 1000.0, 0.2))
             latency = int((time.time() - start_time) * 1000)

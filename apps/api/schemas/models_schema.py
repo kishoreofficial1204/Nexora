@@ -45,6 +45,10 @@ class ApplicationOut(BaseModel):
     academic_year: str
     assessment_date: str
     status: str
+    recommendation: Optional[str] = None
+    recommendation_rationale: Optional[str] = None
+    recommendation_by: Optional[str] = None
+    recommendation_at: Optional[datetime] = None
     rule_pack_id: str
     created_by_id: str
     created_at: datetime

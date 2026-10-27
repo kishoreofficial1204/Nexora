@@ -13,7 +13,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from apps.api.db.database import Base, engine, SessionLocal
-from apps.api.models import User, UserRole, Institution
+from apps.api.models import User, UserRole, Institution, InstitutionRecord
 from apps.api.core.security import get_password_hash
 
 
@@ -89,6 +89,32 @@ def seed_database():
             db.add(inst)
             db.commit()
             print(f"  + Seeded institution: {inst.name} (PID: {inst.permanent_id})")
+
+        # 3. Seed synthetic authorized institutional record for the demo year.
+        record = (
+            db.query(InstitutionRecord)
+            .filter(
+                InstitutionRecord.institution_id == inst.id,
+                InstitutionRecord.academic_year == "2026-27",
+            )
+            .first()
+        )
+        if not record:
+            record = InstitutionRecord(
+                institution_id=inst.id,
+                academic_year="2026-27",
+                approved_intake=60,
+                approved_programmes_json='["Computer Science & Engineering", "Mechanical Engineering"]',
+                previous_eoa_valid_until="2026-06-30",
+                compliance_status="COMPLIANT",
+                ter_payment_status="PAID",
+                application_history_json='[{"academic_year": "2025-26", "status": "approved", "approved_intake": 60}]',
+                source="synthetic_registry_snapshot",
+                is_simulated=True,
+            )
+            db.add(record)
+            db.commit()
+            print("  + Seeded synthetic institutional record for 2026-27")
 
         print("[SUCCESS] Database seeded successfully.")
 

@@ -92,6 +92,7 @@ rules:
       - "chk_univ_affil"
       - "chk_fire_safety"
       - "chk_building_stability"
+      - "chk_infra_photos"
     expected_fields: []
     validation_logic:
       operator: "all_present"
@@ -337,4 +338,222 @@ rules:
     severity: "warning"
     explanation_template: "Submitted infrastructure photo bundle contains {field_val} views, minimum required is 3."
     reviewer_action: "Triage only. Review physical inspection records if required by procedure."
+    is_heuristic: true
+
+  - rule_id: "RULE-INST-001"
+    title: "Permanent Institute ID vs Authorized Institutional Record"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Sec 1.2 / institutional records)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence:
+      - "doc_eoa_app"
+    expected_fields:
+      - "institute_pid"
+    validation_logic:
+      operator: "institution_record_equals"
+      field: "institute_pid"
+      record_field: "permanent_id"
+    severity: "fail"
+    explanation_template: "Permanent Institute ID '{field_val}' does not match authorized institutional record '{record_val}'."
+    reviewer_action: "Escalate to the AICTE portal administrator and verify the institution profile before processing."
+    is_heuristic: false
+
+  - rule_id: "RULE-INST-002"
+    title: "Declared Intake vs Authorized Institutional Record"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Sec 4.2 / institutional records)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence:
+      - "doc_eoa_app"
+    expected_fields:
+      - "intake_capacity"
+    validation_logic:
+      operator: "institution_record_equals"
+      field: "intake_capacity"
+      record_field: "approved_intake"
+    severity: "warning"
+    explanation_template: "Application declares intake '{field_val}', but the authorized institutional record holds '{record_val}'."
+    reviewer_action: "Check whether an intake-change application is attached and route to the programme approval desk."
+    is_heuristic: false
+
+  - rule_id: "RULE-INST-003"
+    title: "Institutional Compliance and TER Status"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft institutional compliance/TER provisions)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence: []
+    expected_fields: []
+    validation_logic:
+      operator: "institution_status_compliant"
+    severity: "warning"
+    explanation_template: "Institutional record reports compliance status '{compliance_status}' and TER status '{ter_status}'."
+    reviewer_action: "Verify outstanding deficiencies and TER payment before recommending approval."
+    is_heuristic: false
+
+  - rule_id: "RULE-INST-004"
+    title: "Institution Name vs Authorized Institutional Record"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Sec 1.3 / institutional records)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence:
+      - "doc_eoa_app"
+    expected_fields:
+      - "institution_name"
+    validation_logic:
+      operator: "institution_record_fuzzy_match"
+      field: "institution_name"
+      record_field: "name"
+      threshold: 0.88
+    severity: "warning"
+    explanation_template: "Institution name '{field_val}' differs from authorized record '{record_val}' (similarity {similarity:.2f})."
+    reviewer_action: "Verify Gazette notification, trust deed, or name-change approval."
+    is_heuristic: false
+
+  - rule_id: "RULE-ANOMALY-NEAR-DUPLICATE"
+    title: "Near-Duplicate Document Signal"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Technical Appendix B)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence: []
+    expected_fields: []
+    validation_logic:
+      operator: "near_duplicate_documents"
+      max_hamming_distance: 12
+    severity: "warning"
+    explanation_template: "Documents '{doc_a}' and '{doc_b}' have near-identical page fingerprints (Hamming distance {distance})."
+    reviewer_action: "Compare both uploads and confirm whether the same evidence was reused for different requirements."
+    is_heuristic: true
+
+  - rule_id: "RULE-ANOMALY-INCREMENTAL-PDF"
+    title: "Structural PDF Revision Signal"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Technical Appendix B)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence: []
+    expected_fields: []
+    validation_logic:
+      operator: "incremental_pdf"
+    severity: "warning"
+    explanation_template: "Structural change signal: incremental revision detected after creation. Needs human comparison."
+    reviewer_action: "Inspect original source document and verify whether content was legitimately revised or edited."
+    is_heuristic: true
+
+  - rule_id: "RULE-ANOMALY-OCR-CONFIDENCE"
+    title: "Low OCR Confidence Signal"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft Technical Appendix B)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence: []
+    expected_fields: []
+    validation_logic:
+      operator: "low_confidence_fields"
+      threshold: 0.85
+    severity: "manual_review_required"
+    explanation_template: "Low OCR confidence ({confidence:.2f}) for field '{field_name}' on '{document_name}'."
+    reviewer_action: "Review the field in the evidence workbench and confirm or correct the value."
+    is_heuristic: true
+
+  - rule_id: "RULE-ANOMALY-QR-ALLOWLIST"
+    title: "QR Resolution and Official-Domain Allowlist"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft verification provisions)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence: []
+    expected_fields: []
+    validation_logic:
+      operator: "qr_allowlist"
+      allowed_domains:
+        - "aicte.gov.in"
+        - "aicte-india.org"
+        - "gov.in"
+        - "nic.in"
+    severity: "warning"
+    explanation_template: "QR code resolves to non-allowlisted domain '{domain}'."
+    reviewer_action: "Do not open the link directly; verify the domain in the official source register and route for manual confirmation."
+    is_heuristic: true
+
+  - rule_id: "RULE-ANOMALY-SIGNATURE"
+    title: "PDF Digital Signature Status"
+    source_document: "AICTE Approval Process Handbook (APH) 2024-25 to 2026-27"
+    source_url: "https://aicte.gov.in/sites/default/files/APH%20Final.pdf"
+    section_page: "TBD: confirm against official handbook (Draft verification provisions)"
+    version: "1.0-draft"
+    effective_from: "2026-04-01"
+    effective_to: "2027-03-31"
+    status: "draft"
+    applicability:
+      category: "Extension of Approval"
+      institution_type: "Engineering & Technology"
+      academic_year: "2026-27"
+    required_evidence: []
+    expected_fields: []
+    validation_logic:
+      operator: "digital_signature_status"
+    severity: "warning"
+    explanation_template: "Digital signature status is '{signature_status}'."
+    reviewer_action: "Use the authorized issuer portal or a trusted signature-validation service before relying on the document."
     is_heuristic: true

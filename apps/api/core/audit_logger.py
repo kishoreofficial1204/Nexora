@@ -84,8 +84,17 @@ def verify_audit_chain(db: Session, entity_id: Optional[str] = None) -> Dict[str
 
     expected_prev = GENESIS_HASH
     for idx, ev in enumerate(events):
-        # In a global chain, ev.prev_hash connects to the previous global record
-        # Verify current_hash matches payload
+        # In a global chain, ev.prev_hash must connect to the previous record.
+        if ev.prev_hash != expected_prev:
+            return {
+                "verified": False,
+                "chain_length": len(events),
+                "status": "broken_link",
+                "tampered_at_event_id": ev.id,
+                "index": idx
+            }
+
+        # Verify current_hash matches the event payload.
         timestamp_iso = ev.timestamp.isoformat() + "Z"
         recomputed = AuditEvent.compute_hash(
             prev_hash=ev.prev_hash,
@@ -106,6 +115,8 @@ def verify_audit_chain(db: Session, entity_id: Optional[str] = None) -> Dict[str
                 "tampered_at_event_id": ev.id,
                 "index": idx
             }
+
+        expected_prev = ev.current_hash
 
     return {
         "verified": True,
