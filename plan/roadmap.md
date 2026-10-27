@@ -40,6 +40,11 @@ These estimates are for the **prototype scope**, not a production rollout.
       application overview, alert centre, rules explorer, evaluation page, and
       governance page.
 - [x] Curated demo reset script with synthetic applicant ownership.
+- [x] Authenticated workbench page rendering and original-PDF opening.
+- [x] Generated, watermarked sample PDF packet pre-attached on new intake.
+
+> For the ordered demo → submission execution sequence, see
+> [`sih-delivery-plan.md`](./sih-delivery-plan.md).
 
 ## What is partial
 

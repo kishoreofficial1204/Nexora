@@ -72,3 +72,12 @@ Stop the API first so SQLite does not hold a write lock:
 ```
 
 Then restart the API.
+
+## Planning documents
+
+| Document | Use it for |
+|---|---|
+| [`roadmap.md`](./roadmap.md) | Current completion status and what is already working. |
+| [`sih-delivery-plan.md`](./sih-delivery-plan.md) | Ordered plan from SIH demo freeze through website submission. |
+| [`demo-checklist.md`](./demo-checklist.md) | Pre-demo runbook, reset steps, and recovery notes. |
+| [`decisions.md`](./decisions.md) | Product, UI, and technical decisions already made. |

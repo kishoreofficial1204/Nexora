@@ -74,7 +74,8 @@ flowchart LR
 - Scrutiny recommendation workflow (`RECOMMEND_APPROVAL`, `RECOMMEND_REJECTION`, `REQUEST_RESUBMISSION`, `REFER_TO_HEARING`) with mandatory officer justification.
 - Official PDF Scrutiny Dossier generator using ReportLab with watermark `"SAMPLE: NOT AN OFFICIAL DOCUMENT"`, SHA-256 document inventory, findings disposition ledger, and signature blocks.
 - Machine-readable JSON dossier export for downstream AICTE ERP integration.
-- Public Applicant View redacting heuristic anomaly signals and internal confidence scores.
+- Authenticated Applicant View (owner-scoped) redacting heuristic anomaly signals and internal confidence scores, with persisted clarification and replacement-upload flow.
+- Generated, watermarked sample PDF packet pre-attached on the new-intake screen for a faster demo walkthrough.
 
 ### 📊 6. Evaluation Harness & Live Presentation (`Milestone 6`)
 - Evaluation harness ([`eval/evaluate.py`](eval/evaluate.py)) over 9 synthetic bundles with ground truth.
