@@ -1,7 +1,7 @@
 services:
   # 1. Backend Service (FastAPI)
   - type: web
-    name: veriscope-api
+    name: nexora-api
     runtime: python
     region: oregon
     plan: free
@@ -11,11 +11,11 @@ services:
       - key: APP_ENV
         value: production
       - key: DATABASE_URL
-        value: sqlite:///./veriscope.db
+        value: sqlite:///./nexora.db
 
   # 2. Frontend Service (Next.js)
   - type: web
-    name: veriscope-web
+    name: nexora-web
     runtime: node
     region: oregon
     plan: free
