@@ -1,7 +1,7 @@
-# VeriScope System Limitations & Governance Disclaimers
+# Nexora System Limitations & Governance Disclaimers
 
 ### 1. Prototype & Decision Support Nature
-- **Not an Official AICTE System:** VeriScope is an independent decision-support prototype. It does not possess direct connectivity to official, restricted AICTE production databases or applicant repositories.
+- **Not an Official AICTE System:** Nexora is an independent decision-support prototype. It does not possess direct connectivity to official, restricted AICTE production databases or applicant repositories.
 - **Advisory Signals Only:** All findings, mismatches, and compliance statuses are advisory signals for authorized scrutiny officers. The platform strictly forbids automated rejection or automated approval decisions.
 
 ### 2. External Issuer Connectors

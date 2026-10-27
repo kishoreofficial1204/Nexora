@@ -1,5 +1,5 @@
 """
-Institution Model for VeriScope.
+Institution Model for Nexora.
 Stores institutional profiles and AICTE Permanent Institute IDs (PID).
 """
 

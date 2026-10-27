@@ -1,5 +1,5 @@
 """
-Application Model for VeriScope.
+Application Model for Nexora.
 Stores submission cases, academic year, category, and configurable assessment date.
 """
 

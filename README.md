@@ -1,4 +1,4 @@
-# VeriScope
+# Nexora
 > **Evidence-backed application scrutiny for technical-education regulatory review**
 >
 > *"One application, one evidence-backed review workspace."*
@@ -6,9 +6,9 @@
 ---
 
 ## 1. Executive Summary & Mission
-**VeriScope** is an AI-assisted, human-in-the-loop decision-support workspace engineered specifically for AICTE (All India Council for Technical Education) scrutiny officers. It transforms complex bundles of submitted institutional documents (Extension of Approval, Land Titles, Affiliations, Fire Safety Certificates, Faculty Rosters, Architectural Plans) into an auditable, evidence-backed review case.
+**Nexora** is an AI-assisted, human-in-the-loop decision-support workspace engineered specifically for AICTE (All India Council for Technical Education) scrutiny officers. It transforms complex bundles of submitted institutional documents (Extension of Approval, Land Titles, Affiliations, Fire Safety Certificates, Faculty Rosters, Architectural Plans) into an auditable, evidence-backed review case.
 
-VeriScope **strictly adheres to decision-support principles**: it never automatically approves or rejects an application, never fabricates verification passes, treats anomaly flags as cautious investigative signals rather than proof of fraud, and enforces mandatory human rationale on every disposition before signing and exporting regulatory dossiers.
+Nexora **strictly adheres to decision-support principles**: it never automatically approves or rejects an application, never fabricates verification passes, treats anomaly flags as cautious investigative signals rather than proof of fraud, and enforces mandatory human rationale on every disposition before signing and exporting regulatory dossiers.
 
 ```mermaid
 flowchart LR
@@ -114,7 +114,7 @@ results and limitations are summarized in [`plan/roadmap.md`](plan/roadmap.md).
 ```bash
 # Clone the repository
 git clone <repo-url>
-cd VeriScope
+cd Nexora
 
 # Create and activate virtual environment
 python -m venv .venv
@@ -167,7 +167,7 @@ npm run dev
 ## 8. Repository Structure
 
 ```text
-VeriScope/
+Nexora/
 ├── apps/
 │   ├── api/                     # FastAPI Backend Application
 │   │   ├── core/                # Security, RBAC, Cryptographic Audit Logger

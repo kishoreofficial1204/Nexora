@@ -1,5 +1,5 @@
 """
-Database Seeding Script for VeriScope.
+Database Seeding Script for Nexora.
 Initializes tables, creates demo role accounts, provisions the synthetic institution,
 and seeds initial demonstration cases.
 """

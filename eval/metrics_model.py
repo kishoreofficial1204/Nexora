@@ -1,5 +1,5 @@
 """
-Evaluation Data Contracts and Schemas for VeriScope.
+Evaluation Data Contracts and Schemas for Nexora.
 Stores metrics definitions, sample counts (n), and evaluation results.
 """
 

@@ -1,5 +1,5 @@
 """
-Rectification Router for VeriScope.
+Rectification Router for Nexora.
 
 Persists reviewer clarification requests and applicant replacement submissions.
 The prototype keeps validation advisory: submitting evidence marks the request as

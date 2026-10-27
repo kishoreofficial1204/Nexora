@@ -1,5 +1,5 @@
 """
-User and Role Model for VeriScope.
+User and Role Model for Nexora.
 Enforces server-side RBAC across applicant, reviewer, senior_reviewer, admin, and auditor roles.
 """
 

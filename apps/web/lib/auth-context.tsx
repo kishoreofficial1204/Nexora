@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
       if (typeof window !== "undefined") {
-        localStorage.setItem("veriscope_token", data.access_token);
+        localStorage.setItem("nexora_token", data.access_token);
       }
       await fetchCurrentUser();
     } finally {
@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // ignore
     }
     if (typeof window !== "undefined") {
-      localStorage.removeItem("veriscope_token");
+      localStorage.removeItem("nexora_token");
     }
     setUser(null);
   };

@@ -1,4 +1,4 @@
-# VeriScope Live Scrutiny Demonstration Script (7-Minute Presentation)
+# Nexora Live Scrutiny Demonstration Script (7-Minute Presentation)
 
 **Tagline:** *"One application, one evidence-backed review workspace."*  
 **Problem Statement:** SIH26261 — AI-Powered Application Validation, Document Authentication & Regulatory Compliance Verification  
@@ -10,7 +10,7 @@
 
 | Time | Segment | Role & Action | Key Talking Points |
 | :--- | :--- | :--- | :--- |
-| **0:00 - 1:00** | **The Mission & Non-Negotiables** | Presenter Overview | 1. Fragmented paper scrutiny creates delays.<br/>2. VeriScope is a **decision-support copilot**, not an automated approval engine.<br/>3. Provenance first: every fact links to document, page, and bounding box. |
+| **0:00 - 1:00** | **The Mission & Non-Negotiables** | Presenter Overview | 1. Fragmented paper scrutiny creates delays.<br/>2. Nexora is a **decision-support copilot**, not an automated approval engine.<br/>3. Provenance first: every fact links to document, page, and bounding box. |
 | **1:00 - 2:30** | **Scenario 1: Clean Approval Path (Bundle A)** | `reviewer@aicte-demo.in` | • Seed Bundle A (`ABC Institute of Technology`)<br/>• OCR extraction & bounding box overlay<br/>• Zero deficiencies flagged; instant clean checklist.<br/>• Scrutiny Officer records recommendation: `RECOMMEND_APPROVAL`. |
 | **2:30 - 4:30** | **Scenario 2: Deficient Case (Bundle C + D)** | `reviewer@aicte-demo.in` | • Seed Bundle C (Expired Fire NOC) & Bundle D (Intake Contradiction)<br/>• **Date Arithmetic:** NOC expired on 2026-03-31 vs Assessment Date 2026-10-26.<br/>• **Dual-Ended Evidence:** Highlighting Application (60 seats) vs Approval Letter (120 seats) simultaneously.<br/>• Reviewer actions: Confirm finding with **mandatory rationale**; request clarification from applicant.<br/>• View **Applicant Portal:** Internal signals redacted, only actionable deficiency notices visible. |
 | **4:30 - 6:00** | **Scenario 3: Anomaly Signals (Bundle E + G)** | `reviewer@aicte-demo.in` & `senior_reviewer@...` | • Seed Bundle E (Duplicate SHA-256) & Bundle G (Modified PDF)<br/>• **Signals, not proof of fraud:** Cautious language alert for multiple incremental xref revisions.<br/>• **Simulated Connector:** External Fire Department registry lookup demonstrating `mismatch` and `timeout` fail-closed behavior.<br/>• Escalate to Senior Reviewer with justification. |
@@ -21,13 +21,13 @@
 ## Detailed Minute-by-Minute Speaker Narrative
 
 ### Minute 0:00 - 1:00: Executive Introduction
-- **Visual:** VeriScope landing page (`/`) showing AICTE header, tagline, and architectural pillars.
+- **Visual:** Nexora landing page (`/`) showing AICTE header, tagline, and architectural pillars.
 - **Narrative:**
   > *"Respected Jury and Scrutiny Officers: Every year, thousands of technical institutions submit complex bundles of legal deeds, certificates, and safety clearances for Extension of Approval (EoA). Manual scrutiny is arduous, prone to oversight, and siloed.*
   >
-  > *Today, we present **VeriScope**. Our tagline is: **'One application, one evidence-backed review workspace.'***
+  > *Today, we present **Nexora**. Our tagline is: **'One application, one evidence-backed review workspace.'***
   >
-  > *Before we demonstrate, let us emphasize our core non-negotiable principle: **VeriScope never automates approve or reject decisions.** It does not fabricate certainty. It is an intelligent decision-support copilot that equips human officers with deterministic rule checks, heuristic anomaly signals, and cryptographic provenance."*
+  > *Before we demonstrate, let us emphasize our core non-negotiable principle: **Nexora never automates approve or reject decisions.** It does not fabricate certainty. It is an intelligent decision-support copilot that equips human officers with deterministic rule checks, heuristic anomaly signals, and cryptographic provenance."*
 
 ---
 
@@ -67,7 +67,7 @@
 ### Minute 3:30 - 4:30: Scenario 2 (Cont.) — Date Expiry Arithmetic (Bundle C)
 - **Visual:** Open Bundle C case.
 - **Narrative:**
-  > *"Notice how VeriScope calculates certificate expiration. In `RULE-EOA-002`, the Fire Safety Certificate has an expiry date of `2026-03-31`. The application assessment date is configured to `2026-10-26`. The engine deterministically flags this as `FAIL`, with citation to APH Clause 2.4."*
+  > *"Notice how Nexora calculates certificate expiration. In `RULE-EOA-002`, the Fire Safety Certificate has an expiry date of `2026-03-31`. The application assessment date is configured to `2026-10-26`. The engine deterministically flags this as `FAIL`, with citation to APH Clause 2.4."*
 
 ---
 
@@ -105,4 +105,4 @@
 ---
 
 ## Conclusion Statement
-> *"VeriScope bridges the gap between manual document fatigue and dangerous black-box automation. It guarantees provenance, enforces transparency, protects applicant privacy, and keeps the human scrutiny officer in complete command. Thank you."*
+> *"Nexora bridges the gap between manual document fatigue and dangerous black-box automation. It guarantees provenance, enforces transparency, protects applicant privacy, and keeps the human scrutiny officer in complete command. Thank you."*

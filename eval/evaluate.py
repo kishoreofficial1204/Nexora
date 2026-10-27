@@ -1,5 +1,5 @@
 """
-Evaluation Harness for VeriScope.
+Evaluation Harness for Nexora.
 
 Runs the real extraction + deterministic validation pipeline over the synthetic
 bundles and compares the resulting findings and fields against ground truth.
@@ -375,7 +375,7 @@ def run_evaluation() -> EvaluationReport:
 
     try:
         reviewer = User(
-            email="evaluation@veriscope.local",
+            email="evaluation@nexora.local",
             hashed_password="not-used",
             full_name="Evaluation Pipeline Runner",
             role=UserRole.REVIEWER,
@@ -449,7 +449,7 @@ def run_evaluation() -> EvaluationReport:
         )
 
         md_lines = [
-            "# VeriScope Evaluation Harness Benchmark Report",
+            "# Nexora Evaluation Harness Benchmark Report",
             f"**Run Timestamp:** {report.timestamp}  ",
             f"**Assessment Date:** {report.assessment_date}  ",
             f"**Evaluation Stage:** {report.evaluation_version}  ",

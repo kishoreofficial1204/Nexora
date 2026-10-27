@@ -1,4 +1,4 @@
-# VeriScope Master Makefile
+# Nexora Master Makefile
 
 PYTHON ?= python
 NPM ?= npm
@@ -6,7 +6,7 @@ NPM ?= npm
 .PHONY: help setup dev-api dev-web seed test eval clean demo
 
 help:
-	@echo "VeriScope Development & Evaluation Commands:"
+	@echo "Nexora Development & Evaluation Commands:"
 	@echo "  make setup     - Install Python and Node dependencies"
 	@echo "  make seed      - Generate synthetic document bundles and ground truth"
 	@echo "  make test      - Run automated test suite (rules, data, pipeline)"

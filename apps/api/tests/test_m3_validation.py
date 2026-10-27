@@ -1,5 +1,5 @@
 """
-Integration Tests for VeriScope Milestone 3 (M3 - Validation & Consistency).
+Integration Tests for Nexora Milestone 3 (M3 - Validation & Consistency).
 Tests known seeded synthetic bundles against upfront ground truth:
 1. bundle_a_clean: Clean baseline produces 0 failures.
 2. bundle_b_missing_doc: Triggers RULE-EOA-001 missing affiliation document.

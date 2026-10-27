@@ -1,5 +1,5 @@
 """
-ExtractedField Model for VeriScope.
+ExtractedField Model for Nexora.
 Stores every extracted field with strict provenance (page, bounding box, extraction method,
 confidence, raw string, and normalized value).
 """

@@ -1,5 +1,5 @@
 /**
- * VeriScope API Client.
+ * Nexora API Client.
  * Handles client-side API requests with credentials and error handling.
  */
 
@@ -7,7 +7,7 @@ export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:800
 export const API_ORIGIN = API_BASE.replace(/\/api\/?$/, "");
 
 function authHeaders(options: RequestInit = {}): Record<string, string> {
-  const token = typeof window !== "undefined" ? localStorage.getItem("veriscope_token") : null;
+  const token = typeof window !== "undefined" ? localStorage.getItem("nexora_token") : null;
 
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string>),

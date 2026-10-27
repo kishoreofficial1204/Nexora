@@ -35,7 +35,7 @@ const PRINCIPLES = [
   {
     icon: Scale,
     title: "Decision support, never automation",
-    body: "VeriScope does not approve, reject, or penalise an institution. It assembles evidence, applies versioned rules, and surfaces advisory signals for a human scrutiny officer.",
+    body: "Nexora does not approve, reject, or penalise an institution. It assembles evidence, applies versioned rules, and surfaces advisory signals for a human scrutiny officer.",
   },
   {
     icon: AlertTriangle,
@@ -111,7 +111,7 @@ export default function GovernancePage() {
               Governance, assurance & demo boundaries
             </h1>
             <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-              VeriScope is a human-in-the-loop decision-support prototype. This page explains the safeguards that make
+              Nexora is a human-in-the-loop decision-support prototype. This page explains the safeguards that make
               the workflow defensible, what is simulated in this demo, and what would be required before any
               production deployment.
             </p>
@@ -294,7 +294,7 @@ export default function GovernancePage() {
         </section>
 
         <div className="rounded-lg border border-surface-border bg-surface px-4 py-3 text-[10px] font-mono text-muted-foreground text-center">
-          VeriScope · decision-support prototype · synthetic data only · no legal validity
+          Nexora · decision-support prototype · synthetic data only · no legal validity
         </div>
       </main>
     </div>

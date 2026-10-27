@@ -1,4 +1,4 @@
-# VeriScope — Demo Checklist
+# Nexora — Demo Checklist
 
 ## Before the demo
 

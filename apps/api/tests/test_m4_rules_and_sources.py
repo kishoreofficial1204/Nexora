@@ -1,5 +1,5 @@
 """
-Integration Tests for VeriScope Milestone 4 (M4 - Rules, Sources & Simulated Connectors).
+Integration Tests for Nexora Milestone 4 (M4 - Rules, Sources & Simulated Connectors).
 Validates:
 1. Rule pack parsing, schema adherence, and draft status notices.
 2. Citation integrity: Every rule must possess an official source document and handbook page/section.

@@ -1,5 +1,5 @@
 """
-Evaluation Harness Router for VeriScope.
+Evaluation Harness Router for Nexora.
 Serves evaluation benchmarks, precision/recall metrics, and confusion matrices.
 Allows running the evaluation suite dynamically.
 """

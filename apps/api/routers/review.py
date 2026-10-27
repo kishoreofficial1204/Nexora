@@ -1,5 +1,5 @@
 """
-Review Console, Recommendations, and Case Dossier Export Router for VeriScope.
+Review Console, Recommendations, and Case Dossier Export Router for Nexora.
 Enforces:
 1. Mandatory rationale validation for all reviewer decisions (cannot dismiss or confirm without non-empty rationale).
 2. Append-only cryptographic audit logging with SHA-256 chaining.
@@ -237,7 +237,7 @@ def export_application_dossier_pdf(
         raise HTTPException(status_code=404, detail="Application not found.")
 
     pdf_bytes = generate_case_dossier_pdf(app, db)
-    filename = f"VeriScope_Dossier_{app.id[:8]}_{datetime.utcnow().strftime('%Y%m%d')}.pdf"
+    filename = f"Nexora_Dossier_{app.id[:8]}_{datetime.utcnow().strftime('%Y%m%d')}.pdf"
 
     return Response(
         content=pdf_bytes,

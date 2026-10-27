@@ -1,5 +1,5 @@
 """
-Authentication Router for VeriScope.
+Authentication Router for Nexora.
 Provides JWT authentication, httpOnly cookie issuance, and user profile retrieval.
 """
 
@@ -33,7 +33,7 @@ def login(login_req: LoginRequest, response: Response, db: Session = Depends(get
 
     # Set secure httpOnly cookie
     response.set_cookie(
-        key="veriscope_token",
+        key="nexora_token",
         value=token,
         httponly=True,
         samesite="lax",
@@ -56,5 +56,5 @@ def get_me(current_user: User = Depends(get_current_user)):
 
 @router.post("/logout")
 def logout(response: Response):
-    response.delete_cookie("veriscope_token")
+    response.delete_cookie("nexora_token")
     return {"message": "Logged out successfully."}

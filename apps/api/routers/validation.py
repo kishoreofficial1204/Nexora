@@ -1,5 +1,5 @@
 """
-Validation & Findings Router for VeriScope.
+Validation & Findings Router for Nexora.
 Executes deterministic compliance rules and anomaly checks.
 Serves evidence-linked findings for the scrutiny review console.
 """

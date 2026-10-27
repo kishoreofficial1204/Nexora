@@ -1,8 +1,8 @@
-# VeriScope — Project Context
+# Nexora — Project Context
 
 ## What this is
 
-VeriScope is a human-in-the-loop decision-support workspace for technical-education
+Nexora is a human-in-the-loop decision-support workspace for technical-education
 application scrutiny. It turns a submitted document bundle into an evidence-backed
 review case: intake, extraction, deterministic rule checks, cross-document checks,
 simulated registry verification, advisory findings, alerts, reviewer rationale,

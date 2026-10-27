@@ -1,5 +1,5 @@
 """
-Source Citation and Regulatory Handbook Search Service for VeriScope.
+Source Citation and Regulatory Handbook Search Service for Nexora.
 Enables scrutiny officers to query regulatory sources, chapters, and rule definitions.
 Implements keyword and semantic scoring over indexed regulatory norms.
 Enforces draft status warnings on all outputs per Non-Negotiable Principle 10.

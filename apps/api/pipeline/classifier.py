@@ -1,5 +1,5 @@
 """
-Document Classifier for VeriScope.
+Document Classifier for Nexora.
 Classifies uploaded documents into recognized AICTE checklist document types
 using heading analysis, structural keywords, and layout features.
 """

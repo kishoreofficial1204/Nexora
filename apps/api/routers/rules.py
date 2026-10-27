@@ -1,5 +1,5 @@
 """
-Rules, Sources, and Test Harness Router for VeriScope.
+Rules, Sources, and Test Harness Router for Nexora.
 Serves versioned rule packs, handbook citations, source search, and test harness execution.
 """
 

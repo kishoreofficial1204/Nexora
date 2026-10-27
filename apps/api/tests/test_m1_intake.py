@@ -1,5 +1,5 @@
 """
-Integration Tests for VeriScope Milestone 1 (M1 - Intake & Security).
+Integration Tests for Nexora Milestone 1 (M1 - Intake & Security).
 Tests:
 1. Authentication & JWT issuance for all 5 roles.
 2. Server-side RBAC enforcement (Applicant forbidden from Reviewer actions).

@@ -1,4 +1,4 @@
-"""Validation orchestration for VeriScope.
+"""Validation orchestration for Nexora.
 
 The validator is deliberately thin: it builds a case context, executes every
 rule in the selected YAML rule pack through the generic interpreter, persists

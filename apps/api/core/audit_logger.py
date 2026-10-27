@@ -1,5 +1,5 @@
 """
-Audit Logger Service for VeriScope.
+Audit Logger Service for Nexora.
 Appends tamper-evident audit events with SHA-256 hash chaining.
 Provides cryptographic chain validation.
 """

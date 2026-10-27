@@ -1,5 +1,5 @@
 """
-Main FastAPI Application Entrypoint for VeriScope.
+Main FastAPI Application Entrypoint for Nexora.
 Configures CORS, mounts routers, and serves API documentation.
 """
 

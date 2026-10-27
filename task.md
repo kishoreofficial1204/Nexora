@@ -1,4 +1,4 @@
-# VeriScope — Implementation Checklist
+# Nexora — Implementation Checklist
 
 > **Status note (2026-10-27):** This is the original phase checklist. Several items
 > have since been implemented or partially implemented. Use

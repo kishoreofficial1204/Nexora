@@ -71,8 +71,8 @@ async def get_current_user(
     token = None
     if auth_header and auth_header.credentials:
         token = auth_header.credentials
-    elif "veriscope_token" in request.cookies:
-        token = request.cookies.get("veriscope_token")
+    elif "nexora_token" in request.cookies:
+        token = request.cookies.get("nexora_token")
 
     if not token:
         raise HTTPException(

@@ -1,4 +1,4 @@
-# VeriScope — Decisions and Constraints
+# Nexora — Decisions and Constraints
 
 ## Product decisions
 
@@ -19,7 +19,7 @@
 - **Light editorial default.** Warm paper background, serif display headings, deep
   teal accent, generous spacing, and a subtle grid texture.
 - **Dark theme is first-class.** A persistent light/dark toggle uses the
-  `veriscope-theme` storage key and an inline no-flash script.
+  `nexora-theme` storage key and an inline no-flash script.
 - **Theme-aware legacy bridge.** Existing utility classes are mapped through CSS
   variables so older panels, badges, and status colours remain readable in both
   themes.

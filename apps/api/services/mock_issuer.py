@@ -1,5 +1,5 @@
 """
-Simulated External Registry Connector for VeriScope.
+Simulated External Registry Connector for Nexora.
 Implements MockIssuerConnector for querying third-party institutional and municipal databases:
 1. AICTE Central Institutional Portal (PID, historic approvals)
 2. State Technical University Registry (Affiliation Orders)

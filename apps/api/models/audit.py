@@ -1,5 +1,5 @@
 """
-Append-Only Tamper-Evident Audit Event Model for VeriScope.
+Append-Only Tamper-Evident Audit Event Model for Nexora.
 Implements cryptographic SHA-256 hash chaining (each block references prev_hash).
 """
 

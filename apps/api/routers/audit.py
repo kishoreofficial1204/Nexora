@@ -1,5 +1,5 @@
 """
-Audit Router for VeriScope.
+Audit Router for Nexora.
 Provides access to append-only tamper-evident audit timelines and cryptographic verification.
 """
 

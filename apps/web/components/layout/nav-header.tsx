@@ -91,7 +91,7 @@ export function NavHeader() {
             </div>
             <div className="leading-tight">
               <div className="flex items-center gap-2">
-                <span className="text-[15px] font-semibold tracking-tight text-foreground">VeriScope</span>
+                <span className="text-[15px] font-semibold tracking-tight text-foreground">Nexora</span>
                 <span className="rounded border border-surface-border bg-surface px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                   Demo
                 </span>

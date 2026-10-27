@@ -111,7 +111,7 @@ export default function EvaluationDashboardPage() {
                 <BarChart3 className="w-4 h-4" />
               </div>
               <h1 className="text-xl font-bold tracking-tight text-slate-100">
-                VeriScope Evaluation & Benchmark Harness
+                Nexora Evaluation & Benchmark Harness
               </h1>
               <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-surface border border-surface-border text-slate-400">
                 {report?.evaluation_version || "Pipeline-v1"}

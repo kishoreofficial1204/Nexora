@@ -1,5 +1,5 @@
 """
-Pluggable OCR Engine Interface for VeriScope.
+Pluggable OCR Engine Interface for Nexora.
 Abstracts OCR backends (RapidOCR, Tesseract) behind a uniform contract.
 Extracts text, word/line bounding boxes, and confidence scores.
 """

@@ -1,5 +1,5 @@
 """
-Job Model for VeriScope.
+Job Model for Nexora.
 Tracks asynchronous background parsing and validation tasks with visible job state.
 """
 

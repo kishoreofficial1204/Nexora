@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "VeriScope | Evidence-Backed Scrutiny Workspace",
+  title: "Nexora | Evidence-Backed Scrutiny Workspace",
   description:
     "Secure, evidence-backed decision support for technical education regulatory scrutiny. Turns submitted document bundles into auditable review cases.",
 };
@@ -13,7 +13,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 const themeScript = `
 (function () {
   try {
-    var stored = localStorage.getItem("veriscope-theme");
+    var stored = localStorage.getItem("nexora-theme");
     var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     var theme = stored === "light" || stored === "dark" ? stored : (prefersDark ? "dark" : "light");
     document.documentElement.classList.toggle("dark", theme === "dark");

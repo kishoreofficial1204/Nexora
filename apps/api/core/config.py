@@ -1,5 +1,5 @@
 """
-VeriScope Core Configuration.
+Nexora Core Configuration.
 Loads environment variables safely with sensible defaults for local development.
 """
 
@@ -8,13 +8,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "VeriScope"
+    APP_NAME: str = "Nexora"
     APP_ENV: str = "development"
     ASSESSMENT_DATE_DEFAULT: str = "2026-10-26"
     PORT: int = 8000
     WEB_PORT: int = 3000
 
-    DATABASE_URL: str = "sqlite:///./veriscope.db"
+    DATABASE_URL: str = "sqlite:///./nexora.db"
 
     JWT_SECRET_KEY: str = "dev-insecure-secret-key-change-in-production-must-be-32-chars-min!"
     JWT_ALGORITHM: str = "HS256"

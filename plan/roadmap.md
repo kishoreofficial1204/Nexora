@@ -1,4 +1,4 @@
-# VeriScope — Roadmap and Current Status
+# Nexora — Roadmap and Current Status
 
 Last reviewed: 2026-10-27
 

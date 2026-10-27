@@ -1,5 +1,5 @@
 """
-Unit Tests for VeriScope Milestone 0.
+Unit Tests for Nexora Milestone 0.
 Validates:
 1. Rule pack structure, draft banner, checklist items, and rule definitions.
 2. Ground truth consistency and schema.

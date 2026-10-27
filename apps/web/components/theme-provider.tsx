@@ -12,7 +12,7 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-const STORAGE_KEY = "veriscope-theme";
+const STORAGE_KEY = "nexora-theme";
 
 function applyTheme(theme: Theme) {
   const root = document.documentElement;

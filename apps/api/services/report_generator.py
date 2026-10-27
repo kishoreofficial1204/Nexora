@@ -1,5 +1,5 @@
 """
-Report Generation Service for VeriScope.
+Report Generation Service for Nexora.
 Generates exportable scrutiny dossiers in structured JSON and signed PDF formats.
 Enforces non-negotiable principles: synthetic watermarking, draft banners, and cryptographic provenance.
 """
@@ -67,7 +67,7 @@ def build_case_dossier_json(app: Application, db: Session) -> Dict[str, Any]:
 
     return {
         "dossier_metadata": {
-            "format": "VeriScope Auditable Case Dossier v1.0",
+            "format": "Nexora Auditable Case Dossier v1.0",
             "generated_at": datetime.utcnow().isoformat() + "Z",
             "rule_pack_id": app.rule_pack_id,
             "banner_notice": DRAFT_BANNER,
@@ -182,7 +182,7 @@ def generate_case_dossier_pdf(app: Application, db: Session) -> bytes:
 
     # 1. Header & Draft Banner
     story.append(Paragraph("ALL INDIA COUNCIL FOR TECHNICAL EDUCATION (AICTE)", title_style))
-    story.append(Paragraph("VeriScope Scrutiny Dossier & Decision Support Audit Report", subtitle_style))
+    story.append(Paragraph("Nexora Scrutiny Dossier & Decision Support Audit Report", subtitle_style))
     story.append(Spacer(1, 4))
 
     # Draft Alert Box

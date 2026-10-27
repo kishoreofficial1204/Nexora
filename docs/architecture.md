@@ -1,4 +1,4 @@
-# VeriScope Architecture Specification
+# Nexora Architecture Specification
 
 ```
                             ┌──────────────────────────────────────────┐

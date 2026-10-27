@@ -1,4 +1,4 @@
-# VeriScope: Project Assumptions & Regulatory Baseline
+# Nexora: Project Assumptions & Regulatory Baseline
 
 **Date:** 2026-10-26  
 **Problem Statement:** SIH26261 — AI-Powered Application Validation, Document Authentication & Regulatory Compliance Verification  

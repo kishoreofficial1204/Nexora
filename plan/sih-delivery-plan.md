@@ -1,4 +1,4 @@
-# VeriScope — SIH Delivery Plan
+# Nexora — SIH Delivery Plan
 
 Last updated: 2026-10-27
 

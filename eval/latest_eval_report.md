@@ -1,5 +1,5 @@
-# VeriScope Evaluation Harness Benchmark Report
-**Run Timestamp:** 2026-10-27T15:18:34.425368Z  
+# Nexora Evaluation Harness Benchmark Report
+**Run Timestamp:** 2026-10-27T17:41:05.492111Z  
 **Assessment Date:** 2026-10-26  
 **Evaluation Stage:** Pipeline-v1  
 **Evaluated Bundles (n):** 9 | **Total Documents (n):** 54

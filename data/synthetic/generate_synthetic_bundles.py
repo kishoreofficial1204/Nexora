@@ -1,5 +1,5 @@
 """
-Synthetic Document Generator for SIH26261 VeriScope.
+Synthetic Document Generator for SIH26261 Nexora.
 Generates reproducible test bundles with watermarked synthetic PDFs/images
 strictly complying with the Non-Negotiable Principles (Section 1).
 """

@@ -1,4 +1,4 @@
-"""Reset and curate the VeriScope demo database.
+"""Reset and curate the Nexora demo database.
 
 This is intentionally a demo utility, not a production migration. It wipes all
 case data, recreates the demo users/institution, then builds a small curated

@@ -1,4 +1,4 @@
-# VeriScope Regulatory Source Register
+# Nexora Regulatory Source Register
 
 This register catalogues all official and reference sources used to formulate rules and retrieval indices.
 All rules derived from these documents carry explicit source identifiers, edition/version tags, and draft notices until certified by AICTE administrators.

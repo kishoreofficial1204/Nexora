@@ -1,5 +1,5 @@
 """
-Configurable rule interpreter for VeriScope.
+Configurable rule interpreter for Nexora.
 
 Rules are data, not code: each YAML rule declares an operator and the interpreter
 resolves the required documents/fields from the case context. The interpreter is

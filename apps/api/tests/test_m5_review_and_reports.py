@@ -1,5 +1,5 @@
 """
-Integration Tests for VeriScope Milestone 5 (M5 - Review Console, Recommendations & Reports).
+Integration Tests for Nexora Milestone 5 (M5 - Review Console, Recommendations & Reports).
 Validates:
 1. Mandatory rationale validation: Cannot confirm or dismiss a finding without non-empty rationale.
 2. Reviewer action state transitions (confirm, dismiss, request_clarification, escalate).

@@ -1,5 +1,5 @@
 """
-Applications Router for VeriScope.
+Applications Router for Nexora.
 Handles case queue listing, application creation, and pre-seeded demo bundles.
 """
 

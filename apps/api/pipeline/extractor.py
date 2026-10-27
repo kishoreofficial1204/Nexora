@@ -1,5 +1,5 @@
 """
-Field Extraction Engine for VeriScope.
+Field Extraction Engine for Nexora.
 
 Extracts structured compliance fields with provenance (page, bbox, confidence,
 method). Native PyMuPDF text is preferred; RapidOCR is used for raster pages.

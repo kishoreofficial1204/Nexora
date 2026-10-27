@@ -476,7 +476,7 @@ export default function ApplicationDetailPage() {
   const handleExport = async (format: "pdf" | "json") => {
     try {
       setExporting(format);
-      const filename = `VeriScope_${application?.institution?.permanent_id || "case"}_${id.substring(0, 8)}.${format}`;
+      const filename = `Nexora_${application?.institution?.permanent_id || "case"}_${id.substring(0, 8)}.${format}`;
       await downloadApiFile(`/applications/${id}/export/${format}`, filename);
     } catch (err: any) {
       alert(`Export failed: ${err.message}`);

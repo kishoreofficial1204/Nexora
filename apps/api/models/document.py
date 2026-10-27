@@ -1,5 +1,5 @@
 """
-Document Model for VeriScope.
+Document Model for Nexora.
 Stores immutable upload records, cryptographic hashes, page counts, and storage locations.
 """
 

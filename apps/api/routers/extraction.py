@@ -1,5 +1,5 @@
 """
-Extraction and Field Provenance Router for VeriScope.
+Extraction and Field Provenance Router for Nexora.
 Handles asynchronous extraction execution, field retrieval with bounding box coordinates,
 inline reviewer corrections with immutable raw value retention, and page image rendering.
 """

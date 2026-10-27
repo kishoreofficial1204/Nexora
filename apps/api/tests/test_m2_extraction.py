@@ -1,5 +1,5 @@
 """
-Integration Tests for VeriScope Milestone 2 (M2 - Extraction & Provenance).
+Integration Tests for Nexora Milestone 2 (M2 - Extraction & Provenance).
 Tests:
 1. Application extraction pipeline execution.
 2. Field provenance verification (page >= 1, valid bbox [x0, y0, x1, y1], confidence, method).

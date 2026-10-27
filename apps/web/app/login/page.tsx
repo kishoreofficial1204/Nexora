@@ -103,7 +103,7 @@ export default function LoginPage() {
             <ShieldCheck className="h-5 w-5" />
           </span>
           <span>
-            <span className="block text-base font-semibold tracking-tight text-foreground">VeriScope</span>
+            <span className="block text-base font-semibold tracking-tight text-foreground">Nexora</span>
             <span className="block text-[11px] text-muted-foreground">Evidence-backed scrutiny workspace</span>
           </span>
         </Link>
@@ -122,7 +122,7 @@ export default function LoginPage() {
             A clear path from document bundle to reviewer decision.
           </h1>
           <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground">
-            VeriScope organizes the evidence, the rule checks, and the registry signals so a scrutiny
+            Nexora organizes the evidence, the rule checks, and the registry signals so a scrutiny
             officer can see what matters and explain the outcome.
           </p>
 

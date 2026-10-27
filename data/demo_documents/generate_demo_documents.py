@@ -52,7 +52,7 @@ def draw_page_frame(c: canvas.Canvas, doc_title: str, page_no: int, page_count: 
     c.setFont("Helvetica-Bold", 7)
     c.setFillColor(colors.HexColor("#64748B"))
     c.drawString(LEFT, PAGE_HEIGHT - 28, "SYNTHETIC DEMO ARTIFACT | NOT AN OFFICIAL RECORD")
-    c.drawString(LEFT, 30, "Generated for the VeriScope SIH walkthrough | fictional institution")
+    c.drawString(LEFT, 30, "Generated for the Nexora SIH walkthrough | fictional institution")
     c.drawRightString(RIGHT, 30, f"{doc_title} | Page {page_no} of {page_count}")
 
     c.setFillColor(colors.HexColor("#0F172A"))
@@ -322,7 +322,7 @@ def building_stability() -> None:
             ):
                 text(c, LEFT, TOP - 94 - (idx * 24), f"-  {line}", 9)
 
-            text(c, LEFT, TOP - 210, "This is a fictional certificate generated for the VeriScope demo.", 9)
+            text(c, LEFT, TOP - 210, "This is a fictional certificate generated for the Nexora demo.", 9)
             text(c, LEFT, TOP - 232, "It is not issued by any government authority.", 9)
 
         footer_note(c, BOTTOM + 24, "Document type: doc_building_stability | synthetic structural certificate")

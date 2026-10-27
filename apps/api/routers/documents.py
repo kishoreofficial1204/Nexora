@@ -1,5 +1,5 @@
 """
-Documents Router for VeriScope.
+Documents Router for Nexora.
 Handles safe multi-file upload, integrity verification, and short-lived streaming.
 """
 

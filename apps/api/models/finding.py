@@ -1,5 +1,5 @@
 """
-Finding Model for VeriScope.
+Finding Model for Nexora.
 Stores evidence-backed findings linking rules, source documents, pages, and severity.
 Strictly distinguishes deterministic rules from heuristic anomaly signals.
 """

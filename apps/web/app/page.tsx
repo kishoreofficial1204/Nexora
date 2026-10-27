@@ -85,7 +85,7 @@ export default function LandingPage() {
   const faqs = [
     {
       q: "Does this platform automatically approve or reject applications?",
-      a: "No. VeriScope is strictly a decision-support workspace. It generates preliminary, evidence-linked findings for AICTE scrutiny officers. Statutory scrutiny authority and all final decisions remain solely with AICTE.",
+      a: "No. Nexora is strictly a decision-support workspace. It generates preliminary, evidence-linked findings for AICTE scrutiny officers. Statutory scrutiny authority and all final decisions remain solely with AICTE.",
     },
     {
       q: "Is external issuer verification real or simulated in the demo?",
@@ -111,7 +111,7 @@ export default function LandingPage() {
               <ShieldCheck className="w-5 h-5 text-accent-foreground" />
             </div>
             <div>
-              <span className="block text-base font-bold tracking-tight text-foreground sm:text-lg">VeriScope</span>
+              <span className="block text-base font-bold tracking-tight text-foreground sm:text-lg">Nexora</span>
               <p className="hidden text-[11px] text-muted-foreground sm:block">
                 Evidence-backed scrutiny workspace
               </p>
@@ -215,7 +215,7 @@ export default function LandingPage() {
               </h1>
 
               <p className="mt-5 text-base sm:text-lg text-muted-foreground leading-relaxed">
-                VeriScope turns bundles of technical institution documents into structured, auditable review cases. 
+                Nexora turns bundles of technical institution documents into structured, auditable review cases.
                 With deterministic rule checking, page-level field provenance, and tamper-evident audit logs, human scrutiny officers stay firmly in command.
               </p>
 
@@ -500,7 +500,7 @@ export default function LandingPage() {
                   Statutory & governance disclaimer
                 </h4>
                 <p className="text-xs text-amber-300/80 leading-relaxed">
-                  VeriScope is an independent technical prototype for evidence-backed scrutiny of technical-education applications.
+                  Nexora is an independent technical prototype for evidence-backed scrutiny of technical-education applications.
                   It is not an official system of the All India Council for Technical Education (AICTE), the Ministry of Education,
                   or any statutory regulatory authority. All data models and sample documents represent synthetic scenarios.
                 </p>
@@ -519,7 +519,7 @@ export default function LandingPage() {
                 <div className="w-6 h-6 rounded bg-accent flex items-center justify-center text-accent-foreground font-bold text-xs">
                   V
                 </div>
-                <span className="font-bold text-slate-200 text-sm">VeriScope</span>
+                <span className="font-bold text-slate-200 text-sm">Nexora</span>
               </div>
               <p className="text-xs leading-relaxed text-muted-foreground">
                 One application, one evidence-backed review workspace.
@@ -559,7 +559,7 @@ export default function LandingPage() {
 
           <div className="mt-8 pt-8 border-t border-surface-border flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-[11px] text-slate-500">
-              VeriScope · demonstration prototype · not a statutory system
+              Nexora · demonstration prototype · not a statutory system
             </div>
             <div className="text-[11px] text-slate-500">
               Human review required for every decision
