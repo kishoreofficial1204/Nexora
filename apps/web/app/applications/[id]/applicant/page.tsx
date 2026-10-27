@@ -12,7 +12,10 @@ import {
   ArrowLeft, 
   UploadCloud, 
   HelpCircle,
-  ExternalLink
+  ExternalLink,
+  X,
+  FileCheck2,
+  Loader2
 } from "lucide-react";
 import { NavHeader } from "@/components/layout/nav-header";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -52,6 +55,10 @@ export default function ApplicantPortalPage() {
 
   const [data, setData] = useState<ApplicantViewData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [uploadNotice, setUploadNotice] = useState<ApplicantNotice | null>(null);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadComplete, setUploadComplete] = useState(false);
 
   useEffect(() => {
     async function loadApplicantData() {
@@ -69,6 +76,26 @@ export default function ApplicantPortalPage() {
       loadApplicantData();
     }
   }, [id]);
+
+  const handleSimulatedUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadNotice || !uploadFile) return;
+    setUploading(true);
+    setUploadComplete(false);
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    setData((current) =>
+      current
+        ? {
+            ...current,
+            action_items_for_applicant: current.action_items_for_applicant.map((item) =>
+              item.notice_id === uploadNotice.notice_id ? { ...item, status: "submitted" } : item
+            ),
+          }
+        : current
+    );
+    setUploading(false);
+    setUploadComplete(true);
+  };
 
   if (loading || !data) {
     return (
@@ -188,11 +215,16 @@ export default function ApplicantPortalPage() {
 
                   <div className="pt-2 flex items-center justify-end">
                     <button
-                      onClick={() => alert("Clarification document upload submission simulated for demo.")}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-accent text-accent-foreground font-semibold text-xs hover:bg-teal-600 transition-colors shadow-sm"
+                      onClick={() => {
+                        setUploadNotice(item);
+                        setUploadFile(null);
+                        setUploadComplete(false);
+                      }}
+                      disabled={item.status === "submitted"}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-accent text-accent-foreground font-semibold text-xs hover:bg-teal-600 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <UploadCloud className="w-3.5 h-3.5" />
-                      <span>Submit Clarification / Re-upload</span>
+                      {item.status === "submitted" ? <FileCheck2 className="w-3.5 h-3.5" /> : <UploadCloud className="w-3.5 h-3.5" />}
+                      <span>{item.status === "submitted" ? "Replacement submitted" : "Submit Clarification / Re-upload"}</span>
                     </button>
                   </div>
                 </div>
@@ -230,6 +262,96 @@ export default function ApplicantPortalPage() {
           {data.note}
         </div>
       </main>
+
+      {uploadNotice && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-lg rounded-lg bg-surface-card border border-surface-border p-6 space-y-4 shadow-2xl">
+            <div className="flex items-start justify-between gap-3 pb-3 border-b border-surface-border">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-100">Submit clarification / replacement evidence</h3>
+                <p className="text-[11px] text-muted-foreground mt-0.5">{uploadNotice.title}</p>
+              </div>
+              <button
+                onClick={() => {
+                  setUploadNotice(null);
+                  setUploadFile(null);
+                  setUploadComplete(false);
+                }}
+                className="text-muted-foreground hover:text-slate-200"
+                aria-label="Close upload dialog"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {uploadComplete ? (
+              <div className="py-4 text-center space-y-3">
+                <div className="w-12 h-12 rounded-full bg-emerald-950 border border-emerald-700 flex items-center justify-center mx-auto">
+                  <FileCheck2 className="w-6 h-6 text-emerald-300" />
+                </div>
+                <h4 className="text-sm font-semibold text-slate-100">Replacement evidence submitted</h4>
+                <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                  The prototype has recorded the simulated applicant response and marked this notice as submitted.
+                  The reviewer can now re-run validation from the case workspace.
+                </p>
+                <div className="inline-flex items-center gap-1.5 text-[10px] font-mono text-cyan-300 bg-cyan-950/40 border border-cyan-900 rounded px-2 py-1">
+                  <ShieldCheck className="w-3 h-3" /> Demo simulation — no file was transmitted
+                </div>
+                <div className="pt-2">
+                  <button
+                    onClick={() => {
+                      setUploadNotice(null);
+                      setUploadFile(null);
+                      setUploadComplete(false);
+                    }}
+                    className="px-4 py-2 rounded-md bg-accent text-accent-foreground text-xs font-semibold hover:bg-teal-600"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSimulatedUpload} className="space-y-4">
+                <div className="p-3 rounded-md bg-surface border border-surface-border text-[11px] text-slate-300 leading-relaxed">
+                  <span className="font-semibold text-amber-300">Requested item:</span> {uploadNotice.requirement_summary}
+                </div>
+                <label className="block cursor-pointer rounded-lg border border-dashed border-surface-border bg-surface hover:border-accent p-5 text-center transition-colors">
+                  <UploadCloud className="w-7 h-7 text-accent mx-auto mb-2" />
+                  <div className="text-xs font-semibold text-slate-200">
+                    {uploadFile ? uploadFile.name : "Choose a replacement PDF or image"}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground mt-1">
+                    PDF, JPG or PNG · up to 25 MB · simulated demo upload
+                  </div>
+                  <input
+                    type="file"
+                    accept=".pdf,.png,.jpg,.jpeg"
+                    className="hidden"
+                    onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                  />
+                </label>
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-surface-border">
+                  <button
+                    type="button"
+                    onClick={() => setUploadNotice(null)}
+                    className="px-4 py-2 rounded-md border border-surface-border text-xs text-slate-300 hover:bg-surface"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!uploadFile || uploading}
+                    className="px-4 py-2 rounded-md bg-accent text-accent-foreground text-xs font-semibold hover:bg-teal-600 disabled:opacity-50 inline-flex items-center gap-1.5"
+                  >
+                    {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
+                    {uploading ? "Submitting..." : "Submit replacement"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

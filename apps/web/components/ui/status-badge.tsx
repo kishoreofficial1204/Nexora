@@ -53,9 +53,28 @@ export function StatusBadge({ status, customLabel, className = "", size = "md" }
       break;
 
     case "warning":
-      label = customLabel || "Warning";
+    case "escalated":
+      label = customLabel || (normalized === "escalated" ? "Escalated" : "Warning");
       icon = <AlertTriangle className={size === "sm" ? "w-3 h-3" : "w-3.5 h-3.5"} />;
       colorClasses = "bg-amber-950/60 text-amber-300 border-amber-800/70";
+      break;
+
+    case "deficiencies_flagged":
+      label = customLabel || "Deficiencies Flagged";
+      icon = <AlertTriangle className={size === "sm" ? "w-3 h-3" : "w-3.5 h-3.5"} />;
+      colorClasses = "bg-rose-950/60 text-rose-300 border-rose-800/70";
+      break;
+
+    case "review_completed":
+      label = customLabel || "Review Completed";
+      icon = <CheckCircle2 className={size === "sm" ? "w-3 h-3" : "w-3.5 h-3.5"} />;
+      colorClasses = "bg-emerald-950/60 text-emerald-300 border-emerald-800/70";
+      break;
+
+    case "in_progress":
+      label = customLabel || "In Progress";
+      icon = <Activity className={size === "sm" ? "w-3 h-3" : "w-3.5 h-3.5"} />;
+      colorClasses = "bg-cyan-950/60 text-cyan-300 border-cyan-800/70";
       break;
 
     case "pending":

@@ -18,6 +18,10 @@ import { NavHeader } from "@/components/layout/nav-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { fetchApi } from "@/lib/api";
 
+const todayIso = new Date().toISOString().slice(0, 10);
+const currentYear = new Date().getFullYear();
+const currentAcademicYear = `${currentYear}-${String((currentYear + 1) % 100).padStart(2, "0")}`;
+
 interface ChecklistItem {
   id: string;
   document_type: string;
@@ -46,11 +50,9 @@ export default function NewApplicationPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Form Fields
-  const [institutionName] = useState("ABC Institute of Technology");
-  const [permanentId] = useState("1-9876543210");
   const [category, setCategory] = useState("Extension of Approval (EoA)");
-  const [academicYear, setAcademicYear] = useState("2026-27");
-  const [assessmentDate, setAssessmentDate] = useState("2026-10-26");
+  const [academicYear, setAcademicYear] = useState(currentAcademicYear);
+  const [assessmentDate, setAssessmentDate] = useState(todayIso);
 
   // Document Uploads
   const [filesByDocType, setFilesByDocType] = useState<Record<string, File>>({});
@@ -141,15 +143,14 @@ export default function NewApplicationPage() {
         <div className="mb-6">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-slate-200 transition-colors mb-3"
+            className="mb-3 inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Back to Application Queue
+            <ArrowLeft className="w-3.5 h-3.5" /> Back to scrutiny queue
           </Link>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-100">
-            Create Application Intake Case
-          </h1>
-          <p className="text-xs text-muted-foreground mt-1">
-            Specify institutional parameters, configure assessment baseline date, and attach supporting evidence documents.
+          <div className="vs-eyebrow">New intake</div>
+          <h1 className="mt-2 text-3xl text-foreground">Create an application case</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            Set the assessment context, attach the evidence bundle, and hand the case to the scrutiny queue.
           </p>
         </div>
 
@@ -183,33 +184,16 @@ export default function NewApplicationPage() {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Section 1: Institution & Case Parameters */}
           <div className="bg-surface-card p-6 rounded-lg border border-surface-border space-y-4">
-            <h3 className="text-sm font-semibold text-slate-100 uppercase font-mono tracking-wider">
-              1. Institutional & Assessment Parameters
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground font-mono">
+              1. Application context
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
-                  Institution Name (Synthetic Profile)
-                </label>
-                <input
-                  type="text"
-                  value={institutionName}
-                  disabled
-                  className="w-full px-3 py-2 bg-surface rounded-md border border-surface-border text-xs text-slate-400 font-sans cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
-                  AICTE Permanent Institute ID (PID)
-                </label>
-                <input
-                  type="text"
-                  value={permanentId}
-                  disabled
-                  className="w-full px-3 py-2 bg-surface rounded-md border border-surface-border text-xs text-slate-400 font-mono cursor-not-allowed"
-                />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="rounded-md border border-surface-border bg-surface px-3.5 py-3 sm:col-span-2">
+                <div className="text-xs font-semibold text-foreground">Synthetic institution profile</div>
+                <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+                  This demo attaches the intake to a seeded synthetic institution. Institution identity is not editable in the prototype.
+                </p>
               </div>
 
               <div>
@@ -236,19 +220,21 @@ export default function NewApplicationPage() {
                   onChange={(e) => setAcademicYear(e.target.value)}
                   className="w-full px-3 py-2 bg-surface rounded-md border border-surface-border text-xs text-slate-200 focus:outline-none focus:border-accent font-mono"
                 >
-                  <option value="2026-27">2026-27</option>
-                  <option value="2025-26">2025-26</option>
+                  <option value={currentAcademicYear}>{currentAcademicYear}</option>
+                  <option value={`${currentYear - 1}-${String(currentYear % 100).padStart(2, "0")}`}>
+                    {currentYear - 1}-{String(currentYear % 100).padStart(2, "0")}
+                  </option>
                 </select>
               </div>
 
               <div className="sm:col-span-2 bg-surface p-3.5 rounded-md border border-surface-border">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-200">
-                      Assessment Baseline Date
+                    <label className="block text-xs font-semibold text-foreground">
+                      Assessment date
                     </label>
                     <p className="text-[11px] text-muted-foreground">
-                      Fixed assessment date for certificate expiry and rule evaluation. System never silently uses dynamic today.
+                      Used consistently for certificate validity and time-bound rule checks.
                     </p>
                   </div>
                   <input

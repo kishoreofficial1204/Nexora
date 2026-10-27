@@ -1,47 +1,71 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ShieldCheck, Lock, User, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  FileSearch,
+  LockKeyhole,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const DEMO_ROLES = [
   {
-    role: "Scrutiny Officer (Reviewer)",
+    role: "Scrutiny Officer",
     email: "reviewer@aicte-demo.in",
-    org: "AICTE Scrutiny Cell, Northern Region",
+    org: "AICTE Scrutiny Cell · Northern Region",
     description: "Evaluates extracted facts, cross-document discrepancies, and records review actions.",
-    badge: "Primary Demo Role"
+    badge: "Primary demo role",
   },
   {
-    role: "Senior Reviewer / Bureau Approver",
+    role: "Senior Reviewer",
     email: "senior_reviewer@aicte-demo.in",
-    org: "AICTE Approval Bureau, New Delhi",
+    org: "AICTE Approval Bureau · New Delhi",
     description: "Reviews escalations, inspects officer rationales, and oversees case queues.",
-    badge: "Escalations"
+    badge: "Escalations",
   },
   {
-    role: "System & Rules Administrator",
+    role: "Rules Administrator",
     email: "admin@aicte-demo.in",
     org: "AICTE IT & Policy Directorate",
-    description: "Manages versioned regulatory rule packs, checklist schemas, and connectors.",
-    badge: "Admin"
+    description: "Manages versioned rule packs, checklist schemas, and simulated connectors.",
+    badge: "Admin",
   },
   {
     role: "Statutory Auditor",
     email: "auditor@aicte-demo.in",
-    org: "Independent Governance Oversight",
-    description: "Read-only access to tamper-evident audit ledger and cryptographic hash chain.",
-    badge: "Read-Only"
+    org: "Independent governance oversight",
+    description: "Read-only access to the tamper-evident audit ledger and hash chain.",
+    badge: "Read only",
   },
   {
     role: "Institute Applicant",
     email: "applicant@aicte-demo.in",
     org: "ABC Institute of Technology",
-    description: "Restricted view: sees permitted deficiency notices and uploads replacement evidence.",
-    badge: "Applicant View"
-  }
+    description: "Restricted view of permitted deficiency notices and replacement evidence uploads.",
+    badge: "Applicant view",
+  },
+];
+
+const FLOW_POINTS = [
+  {
+    title: "Open the case",
+    detail: "See the submitted bundle, extracted fields, and the exact source page behind every fact.",
+  },
+  {
+    title: "Review the signals",
+    detail: "Rule checks and registry lookups produce advisory findings, never automatic decisions.",
+  },
+  {
+    title: "Record the rationale",
+    detail: "A reviewer acknowledges alerts and signs off. The audit trail captures every action.",
+  },
 ];
 
 export default function LoginPage() {
@@ -51,6 +75,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState("DemoPass123!");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const selectedRole = useMemo(
+    () => DEMO_ROLES.find((role) => role.email === selectedEmail) || DEMO_ROLES[0],
+    [selectedEmail]
+  );
 
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -66,112 +95,157 @@ export default function LoginPage() {
     }
   };
 
-  const handleQuickSelect = (email: string) => {
-    setSelectedEmail(email);
-    setPassword("DemoPass123!");
-  };
-
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link href="/" className="inline-flex items-center gap-2 mb-4">
-          <div className="w-10 h-10 rounded-md bg-accent flex items-center justify-center text-white">
-            <ShieldCheck className="w-6 h-6" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-slate-100">VeriScope</span>
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
+        <Link href="/" className="flex items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-accent text-accent-foreground">
+            <ShieldCheck className="h-5 w-5" />
+          </span>
+          <span>
+            <span className="block text-base font-semibold tracking-tight text-foreground">VeriScope</span>
+            <span className="block text-[11px] text-muted-foreground">Evidence-backed scrutiny workspace</span>
+          </span>
         </Link>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-100">
-          Sign In to Scrutiny Workspace
-        </h2>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Select a pre-seeded synthetic role profile or enter credentials manually.
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-xl">
-        <div className="bg-surface-card py-8 px-4 shadow-xl border border-surface-border sm:rounded-lg sm:px-10">
-          {error && (
-            <div className="mb-6 p-4 rounded-md bg-rose-950/40 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {/* Quick Role Switcher */}
-          <div className="mb-6">
-            <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-3">
-              1-Click Demo Role Switcher
-            </label>
-            <div className="grid grid-cols-1 gap-2.5">
-              {DEMO_ROLES.map((r) => {
-                const isSelected = selectedEmail === r.email;
-                return (
-                  <button
-                    key={r.email}
-                    type="button"
-                    onClick={() => handleQuickSelect(r.email)}
-                    className={`text-left p-3 rounded-md border text-xs transition-all flex items-start justify-between ${
-                      isSelected
-                        ? "bg-accent/15 border-accent text-slate-100"
-                        : "bg-surface border-surface-border text-muted-foreground hover:border-slate-700 hover:text-slate-200"
-                    }`}
-                  >
-                    <div>
-                      <div className="font-semibold text-slate-200 flex items-center gap-2">
-                        <span>{r.role}</span>
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400">
-                          {r.badge}
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-muted-foreground mt-0.5 font-mono">{r.email}</div>
-                      <div className="text-[11px] text-slate-400 mt-1">{r.description}</div>
-                    </div>
-                    {isSelected && (
-                      <CheckCircle2 className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-4 pt-4 border-t border-surface-border">
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Email Address</label>
-              <input
-                type="email"
-                value={selectedEmail}
-                onChange={(e) => setSelectedEmail(e.target.value)}
-                required
-                className="w-full px-3 py-2 bg-surface rounded-md border border-surface-border text-sm text-slate-100 focus:outline-none focus:border-accent font-mono text-xs"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-3 py-2 bg-surface rounded-md border border-surface-border text-sm text-slate-100 focus:outline-none focus:border-accent font-mono text-xs"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md bg-accent text-accent-foreground font-semibold text-xs hover:bg-teal-600 transition-colors focus:outline-none disabled:opacity-50"
-            >
-              {loading ? "Authenticating..." : "Sign In with Role"} <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
-
-          <div className="mt-6 text-center text-[11px] text-muted-foreground">
-            Default demo password: <span className="font-mono text-slate-300">DemoPass123!</span>
-          </div>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <Link href="/" className="text-xs font-medium text-muted-foreground hover:text-foreground">
+            Back to overview
+          </Link>
         </div>
-      </div>
+      </header>
+
+      <main className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-12 px-4 pb-16 pt-6 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20 lg:px-8 lg:pt-10">
+        <section className="hidden lg:block">
+          <div className="vs-eyebrow">Independent scrutiny workspace</div>
+          <h1 className="mt-4 max-w-xl text-5xl leading-[1.04] text-foreground xl:text-6xl">
+            A clear path from document bundle to reviewer decision.
+          </h1>
+          <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground">
+            VeriScope organizes the evidence, the rule checks, and the registry signals so a scrutiny
+            officer can see what matters and explain the outcome.
+          </p>
+
+          <ol className="mt-10 max-w-lg space-y-5">
+            {FLOW_POINTS.map((point, index) => (
+              <li key={point.title} className="flex gap-4">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-surface-border bg-surface-card font-mono text-xs text-accent">
+                  {index + 1}
+                </span>
+                <div>
+                  <div className="text-sm font-semibold text-foreground">{point.title}</div>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{point.detail}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <div className="mt-10 max-w-lg rounded-lg border border-surface-border bg-surface-card p-5">
+            <div className="flex items-center gap-2">
+              <FileSearch className="h-4 w-4 text-accent" />
+              <span className="vs-eyebrow">What the demo covers</span>
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-3 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Safe document intake
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Page-level evidence
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Versioned rule checks
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Human sign-off
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto w-full max-w-md lg:mx-0">
+          <div className="vs-card p-6 sm:p-8">
+            <div className="vs-eyebrow">Demo access</div>
+            <h2 className="mt-1 text-3xl text-foreground">Sign in</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Choose a seeded role to explore the reviewer workspace. Every account uses the same demo password.
+            </p>
+
+            <form onSubmit={handleLogin} className="mt-6 space-y-4">
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold text-foreground">Demo role</label>
+                <select
+                  value={selectedEmail}
+                  onChange={(e) => setSelectedEmail(e.target.value)}
+                  className="vs-input text-sm"
+                >
+                  {DEMO_ROLES.map((role) => (
+                    <option key={role.email} value={role.email}>
+                      {role.role} — {role.badge}
+                    </option>
+                  ))}
+                </select>
+                <div className="mt-2 rounded-md border border-surface-border bg-surface px-3.5 py-3">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                    <UserRound className="h-3.5 w-3.5 text-accent" />
+                    {selectedRole.org}
+                  </div>
+                  <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+                    {selectedRole.description}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold text-foreground">Email address</label>
+                <input
+                  type="email"
+                  value={selectedEmail}
+                  onChange={(e) => setSelectedEmail(e.target.value)}
+                  required
+                  className="vs-input font-mono text-sm"
+                />
+              </div>
+
+              <div>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground">Password</label>
+                  <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <LockKeyhole className="h-3 w-3" /> Demo only
+                  </span>
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="vs-input font-mono text-sm"
+                />
+              </div>
+
+              {error && (
+                <div className="flex items-start gap-2 rounded-md border border-rose-200 bg-rose-50 px-3.5 py-3 text-xs text-rose-700">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <button type="submit" disabled={loading} className="vs-button-primary w-full py-3 text-sm">
+                {loading ? "Signing in…" : "Enter the workspace"}
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </form>
+
+            <div className="mt-5 flex items-center justify-between border-t border-surface-border pt-4 text-[11px] text-muted-foreground">
+              <span>Demo password</span>
+              <span className="font-mono text-foreground">DemoPass123!</span>
+            </div>
+          </div>
+
+          <p className="mt-4 text-center text-[11px] leading-relaxed text-muted-foreground">
+            Synthetic records only. Findings are advisory and require human review.
+          </p>
+        </section>
+      </main>
     </div>
   );
 }

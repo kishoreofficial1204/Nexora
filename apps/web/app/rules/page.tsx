@@ -20,6 +20,12 @@ import { NavHeader } from "@/components/layout/nav-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { fetchApi } from "@/lib/api";
 
+const todayIso = new Date().toISOString().slice(0, 10);
+const lastYearIso = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+const currentYear = new Date().getFullYear();
+const currentAcademicYear = `${currentYear}-${String((currentYear + 1) % 100).padStart(2, "0")}`;
+const previousAcademicYear = `${currentYear - 1}-${String(currentYear % 100).padStart(2, "0")}`;
+
 interface RuleItem {
   rule_id: string;
   title: string;
@@ -172,13 +178,13 @@ export default function RuleExplorerPage() {
       };
     } else if (rule.rule_id === "RULE-EOA-002" || rule.rule_id === "RULE-EOA-003") {
       initialFacts = {
-        valid_until_date: "2026-03-31",
-        assessment_date: "2026-10-26"
+        valid_until_date: lastYearIso,
+        assessment_date: todayIso
       };
     } else if (rule.rule_id === "RULE-EOA-004") {
       initialFacts = {
-        academic_year: "2025-26",
-        expected_year: "2026-27"
+        academic_year: previousAcademicYear,
+        expected_year: currentAcademicYear
       };
     } else if (rule.rule_id === "RULE-EOA-005") {
       initialFacts = {
@@ -256,10 +262,10 @@ export default function RuleExplorerPage() {
           <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
           <div className="space-y-1">
             <div className="font-bold tracking-wide uppercase font-mono text-[11px] text-amber-300">
-              UNVERIFIED AGAINST CURRENT HANDBOOK: DRAFT RULES FOR DEMO DECISION SUPPORT
+              Draft rule pack · verify against the current handbook
             </div>
             <p className="text-amber-200/90 leading-relaxed text-[11px]">
-              All regulatory rule definitions, citations, and clauses are marked draft and must be confirmed against the official published AICTE Approval Process Handbook (APH 2024-27). Source placeholders display "TBD: confirm against official handbook".
+              Rule definitions, citations, and clauses are draft-only for this prototype. Confirm every rule against the official published Approval Process Handbook before operational use.
             </p>
           </div>
         </div>
@@ -271,9 +277,11 @@ export default function RuleExplorerPage() {
               <h1 className="text-xl font-bold tracking-tight text-slate-100">
                 Rule Pack & Regulatory Sources Explorer
               </h1>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-surface border border-surface-border text-slate-300">
-                v{rulePack?.rule_pack.version || "2026.1-draft"}
-              </span>
+              {rulePack?.rule_pack.version && (
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-surface border border-surface-border text-muted-foreground">
+                  v{rulePack.rule_pack.version}
+                </span>
+              )}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Active Pack: <strong className="text-slate-200">{rulePack?.rule_pack.name}</strong> · Academic Year: <strong className="font-mono text-cyan-400">{rulePack?.rule_pack.academic_year}</strong>

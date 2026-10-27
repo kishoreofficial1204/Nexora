@@ -87,15 +87,15 @@ export default function EvaluationDashboardPage() {
 
   const avgPrecision = report?.detection_metrics?.length 
     ? (report.detection_metrics.reduce((acc, m) => acc + m.precision, 0) / report.detection_metrics.length) * 100
-    : 100;
+    : 0;
 
   const avgRecall = report?.detection_metrics?.length
     ? (report.detection_metrics.reduce((acc, m) => acc + m.recall, 0) / report.detection_metrics.length) * 100
-    : 100;
+    : 0;
 
   const avgF1 = report?.detection_metrics?.length
     ? (report.detection_metrics.reduce((acc, m) => acc + m.f1_score, 0) / report.detection_metrics.length)
-    : 1.0;
+    : 0;
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
@@ -200,7 +200,7 @@ export default function EvaluationDashboardPage() {
               </thead>
               <tbody className="divide-y divide-surface-border">
                 {(report?.field_metrics || []).map((m, idx) => (
-                  <tr key={idx} className="hover:bg-surface/50 transition-colors">
+                  <tr key={idx} className="hover:bg-surface-hover transition-colors">
                     <td className="py-3 px-4 font-mono font-bold text-slate-200">{m.field_type}</td>
                     <td className="py-3 px-4 font-mono text-muted-foreground">n = {m.sample_size}</td>
                     <td className="py-3 px-4 font-mono text-emerald-400">{(m.exact_match_rate * 100).toFixed(0)}%</td>
@@ -240,7 +240,7 @@ export default function EvaluationDashboardPage() {
               </thead>
               <tbody className="divide-y divide-surface-border">
                 {(report?.detection_metrics || []).map((d, idx) => (
-                  <tr key={idx} className="hover:bg-surface/50 transition-colors font-mono">
+                  <tr key={idx} className="hover:bg-surface-hover transition-colors font-mono">
                     <td className="py-3 px-4 font-bold text-slate-200 font-sans">{d.category}</td>
                     <td className="py-3 px-4 text-emerald-400">{d.true_positives}</td>
                     <td className="py-3 px-4 text-rose-400">{d.false_positives}</td>

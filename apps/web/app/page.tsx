@@ -21,6 +21,7 @@ import {
   Compass
 } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -53,7 +54,7 @@ export default function LandingPage() {
       title: "Expired Fire Safety",
       badge: "fail",
       badgeText: "Validity Expired",
-      description: "Fire NOC expired 2026-03-31, failing check against assessment baseline date 2026-10-26.",
+      description: "Fire NOC lapsed before the assessment date, triggering a validity failure.",
     },
     {
       id: "bundle_d_intake_mismatch",
@@ -103,21 +104,16 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
       {/* Sticky Top Navbar */}
-      <header className="sticky top-0 z-40 w-full border-b border-surface-border bg-background/90 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-40 w-full border-b border-surface-border bg-background backdrop-blur-md">
+        <div className="flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-md bg-accent flex items-center justify-center text-accent-foreground shadow-sm">
-              <ShieldCheck className="w-5 h-5 text-white" />
+              <ShieldCheck className="w-5 h-5 text-accent-foreground" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold tracking-tight text-base sm:text-lg text-slate-100">VeriScope</span>
-                <span className="text-[10px] uppercase font-mono tracking-wider px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                  SIH26261
-                </span>
-              </div>
-              <p className="text-[11px] text-muted-foreground hidden sm:block">
-                AI-Assisted Regulatory Decision Support
+              <span className="block text-base font-bold tracking-tight text-foreground sm:text-lg">VeriScope</span>
+              <p className="hidden text-[11px] text-muted-foreground sm:block">
+                Evidence-backed scrutiny workspace
               </p>
             </div>
           </div>
@@ -130,22 +126,26 @@ export default function LandingPage() {
             <Link href="/evaluation" className="hover:text-accent transition-colors">Evaluation Harness</Link>
           </nav>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
             <Link
               href="/dashboard"
-              className="px-4 py-2 text-xs font-semibold rounded-md bg-accent text-accent-foreground hover:bg-teal-600 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+              className="vs-button-primary"
             >
               Open Reviewer Console
             </Link>
           </div>
 
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-slate-400 hover:text-slate-100 focus:outline-none"
-            aria-label="Toggle mobile menu"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-muted-foreground hover:text-foreground focus:outline-none"
+              aria-label="Toggle mobile menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Collapsing Mobile Menu */}
@@ -207,7 +207,7 @@ export default function LandingPage() {
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-card border border-surface-border text-xs text-muted-foreground mb-6 font-mono">
                 <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                <span>INDEPENDENT PROTOTYPE · SIH26261 · AY 2026-27</span>
+                <span>EVIDENCE-BACKED SCRUTINY · SYNTHETIC DATA ONLY</span>
               </div>
 
               <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-100 leading-tight">
@@ -437,7 +437,7 @@ export default function LandingPage() {
               ].map((s) => (
                 <div key={s.step} className="bg-surface-card p-5 rounded-lg border border-surface-border flex flex-col justify-between">
                   <div>
-                    <div className="w-7 h-7 rounded-full bg-accent/20 text-accent font-mono text-xs flex items-center justify-center font-bold mb-3">
+                    <div className="w-7 h-7 rounded-full bg-accent-muted text-accent font-mono text-xs flex items-center justify-center font-bold mb-3">
                       {s.step}
                     </div>
                     <h4 className="font-semibold text-slate-100 text-sm">{s.title}</h4>
@@ -497,11 +497,11 @@ export default function LandingPage() {
               <AlertCircle className="w-6 h-6 text-amber-400 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <h4 className="text-sm font-semibold text-amber-200">
-                  Statutory & Prototype Governance Disclaimer
+                  Statutory & governance disclaimer
                 </h4>
                 <p className="text-xs text-amber-300/80 leading-relaxed">
-                  VeriScope is an independent technical prototype developed for Smart India Hackathon problem statement SIH26261. 
-                  It is not an official system of the All India Council for Technical Education (AICTE), the Ministry of Education, 
+                  VeriScope is an independent technical prototype for evidence-backed scrutiny of technical-education applications.
+                  It is not an official system of the All India Council for Technical Education (AICTE), the Ministry of Education,
                   or any statutory regulatory authority. All data models and sample documents represent synthetic scenarios.
                 </p>
               </div>
@@ -516,7 +516,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-accent flex items-center justify-center text-white font-bold text-xs">
+                <div className="w-6 h-6 rounded bg-accent flex items-center justify-center text-accent-foreground font-bold text-xs">
                   V
                 </div>
                 <span className="font-bold text-slate-200 text-sm">VeriScope</span>
@@ -524,8 +524,8 @@ export default function LandingPage() {
               <p className="text-xs leading-relaxed text-muted-foreground">
                 One application, one evidence-backed review workspace.
               </p>
-              <div className="text-[11px] font-mono text-slate-500">
-                Rule Pack: eoa_v2026_draft (2026.1-draft)
+              <div className="text-[11px] text-slate-500">
+                Synthetic records · simulated registries · advisory findings
               </div>
             </div>
 
@@ -559,10 +559,10 @@ export default function LandingPage() {
 
           <div className="mt-8 pt-8 border-t border-surface-border flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-[11px] text-slate-500">
-              © 2026 VeriScope Prototype. Built strictly for SIH26261 evaluation.
+              VeriScope · demonstration prototype · not a statutory system
             </div>
-            <div className="text-[11px] font-mono text-slate-500">
-              Assessment Date Baseline: 2026-10-26
+            <div className="text-[11px] text-slate-500">
+              Human review required for every decision
             </div>
           </div>
         </div>

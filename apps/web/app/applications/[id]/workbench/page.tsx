@@ -250,7 +250,7 @@ export default function EvidenceWorkbenchPage() {
             onClick={() => setCompareMode(!compareMode)}
             className={`px-2.5 py-1.5 rounded border text-xs font-medium flex items-center gap-1.5 transition-colors ${
               compareMode
-                ? "bg-accent/20 border-accent text-accent"
+                ? "bg-accent-muted border-accent text-accent"
                 : "bg-surface border-surface-border text-slate-300 hover:text-white"
             }`}
           >
@@ -287,7 +287,7 @@ export default function EvidenceWorkbenchPage() {
                   onClick={() => handleSelectDoc(doc.id)}
                   className={`w-full text-left p-2.5 rounded-md border text-xs transition-all ${
                     isSelected
-                      ? "bg-accent/15 border-accent text-slate-100 shadow-sm"
+                      ? "bg-accent-muted border-accent text-foreground shadow-sm"
                       : "bg-surface-card border-surface-border text-slate-300 hover:border-slate-700"
                   }`}
                 >
@@ -537,7 +537,7 @@ export default function EvidenceWorkbenchPage() {
                     className={`p-3 rounded-lg border text-xs cursor-pointer transition-all ${
                       isSelected
                         ? "bg-surface-card border-accent shadow-md ring-1 ring-accent/30"
-                        : "bg-surface-card/60 border-surface-border hover:border-slate-700"
+                        : "bg-surface-card border-surface-border hover:border-accent"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1.5">
