@@ -8,7 +8,7 @@ import shutil
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
+from sqlalchemy import desc, or_
 
 from apps.api.db.database import get_db
 from apps.api.models.user import User, UserRole
@@ -35,9 +35,15 @@ def list_applications(
 ):
     query = db.query(Application).order_by(desc(Application.created_at))
 
-    # RBAC: Applicants see only their own applications
+    # RBAC: Applicants see only their own applications. Legacy/demo cases may
+    # identify the owner through created_by_id rather than applicant_id.
     if current_user.role == UserRole.APPLICANT:
-        query = query.filter(Application.created_by_id == current_user.id)
+        query = query.filter(
+            or_(
+                Application.applicant_id == current_user.id,
+                Application.created_by_id == current_user.id,
+            )
+        )
 
     if status_filter:
         query = query.filter(Application.status == status_filter)
@@ -70,7 +76,8 @@ def create_application(
         assessment_date=app_in.assessment_date,
         status=ApplicationStatus.PRELIMINARY_REVIEW,
         rule_pack_id=app_in.rule_pack_id,
-        created_by_id=current_user.id
+        created_by_id=current_user.id,
+        applicant_id=current_user.id if current_user.role == UserRole.APPLICANT else None,
     )
     db.add(application)
     db.commit()
@@ -105,7 +112,7 @@ def get_application(
     if not app:
         raise HTTPException(status_code=404, detail="Application case not found.")
 
-    if current_user.role == UserRole.APPLICANT and app.created_by_id != current_user.id:
+    if current_user.role == UserRole.APPLICANT and app.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Forbidden: You do not have access to this application.")
 
     return app

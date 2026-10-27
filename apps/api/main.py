@@ -8,12 +8,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from apps.api.core.config import settings
-from apps.api.db.database import Base, engine
+from apps.api.db.database import Base, engine, ensure_demo_schema
 import apps.api.models  # Ensure all model entities are imported
-from apps.api.routers import auth, applications, documents, audit, rules, extraction, validation, verification, alerts, review, evaluation
+from apps.api.routers import auth, applications, documents, audit, rules, extraction, validation, verification, alerts, review, evaluation, rectifications
 
-# Ensure all declared database tables exist
+# Ensure all declared database tables exist, then apply additive demo migrations.
 Base.metadata.create_all(bind=engine)
+ensure_demo_schema()
 
 app = FastAPI(
     title=f"{settings.APP_NAME} Regulatory Scrutiny Decision-Support API",
@@ -49,6 +50,7 @@ app.include_router(validation.router)
 app.include_router(verification.router)
 app.include_router(alerts.router)
 app.include_router(review.router)
+app.include_router(rectifications.router)
 app.include_router(evaluation.router)
 
 

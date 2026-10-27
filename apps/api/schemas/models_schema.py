@@ -51,6 +51,7 @@ class ApplicationOut(BaseModel):
     recommendation_at: Optional[datetime] = None
     rule_pack_id: str
     created_by_id: str
+    applicant_id: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     institution: Optional[InstitutionOut] = None

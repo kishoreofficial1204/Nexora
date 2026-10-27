@@ -10,11 +10,13 @@ Validates:
 7. Applicant restricted view with internal heuristic signals redacted.
 """
 
+import os
 import pytest
 from fastapi.testclient import TestClient
 from apps.api.main import app
 
 client = TestClient(app)
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
 
 def get_token(email: str = "reviewer@aicte-demo.in") -> str:
@@ -99,6 +101,118 @@ def test_reviewer_finding_disposition_transitions():
     assert res_dism.json()["status"] == "dismissed"
 
 
+def test_sensitive_case_routes_require_authentication():
+    """Dossier exports and the applicant view must not be anonymously accessible."""
+    app_id, finding_id, headers = create_case_with_findings()
+    anonymous = TestClient(app)
+
+    for path in (
+        f"/api/applications/{app_id}/export/json",
+        f"/api/applications/{app_id}/export/pdf",
+        f"/api/applications/{app_id}/applicant-view",
+        f"/api/applications/{app_id}/rectifications",
+    ):
+        res = anonymous.get(path)
+        assert res.status_code == 401, path
+
+
+def test_applicant_cannot_export_internal_dossier():
+    """Applicant role must not access the internal dossier export."""
+    app_id, finding_id, headers = create_case_with_findings()
+    applicant_token = get_token("applicant@aicte-demo.in")
+    applicant_headers = {"Authorization": f"Bearer {applicant_token}"}
+
+    res = client.get(f"/api/applications/{app_id}/export/json", headers=applicant_headers)
+    assert res.status_code == 403
+
+
+def test_applicant_can_access_own_case():
+    """Applicant ownership is recorded on intake and grants applicant-view access."""
+    applicant_token = get_token("applicant@aicte-demo.in")
+    applicant_headers = {"Authorization": f"Bearer {applicant_token}"}
+
+    create_res = client.post(
+        "/api/applications",
+        headers=applicant_headers,
+        json={"academic_year": "2026-27", "assessment_date": "2026-10-26"},
+    )
+    assert create_res.status_code == 201
+    created = create_res.json()
+    assert created["applicant_id"]
+
+    view_res = client.get(
+        f"/api/applications/{created['id']}/applicant-view",
+        headers=applicant_headers,
+    )
+    assert view_res.status_code == 200
+    assert view_res.json()["application_id"] == created["id"]
+
+
+def test_persisted_rectification_flow():
+    """Clarification requests persist, accept a replacement document, and resolve."""
+    app_id, finding_id, headers = create_case_with_findings()
+
+    clar = client.post(
+        f"/api/findings/{finding_id}/review",
+        json={
+            "action": "request_clarification",
+            "rationale": "Please submit the renewed Fire Safety NOC for verification.",
+            "clarification_item": "doc_fire_safety",
+        },
+        headers=headers,
+    )
+    assert clar.status_code == 200
+    rectification_id = clar.json()["rectification_id"]
+    assert rectification_id
+
+    list_res = client.get(
+        f"/api/applications/{app_id}/rectifications",
+        headers=headers,
+    )
+    assert list_res.status_code == 200
+    assert any(item["id"] == rectification_id for item in list_res.json())
+
+    sample_path = os.path.join(
+        PROJECT_ROOT,
+        "data",
+        "synthetic",
+        "bundles",
+        "bundle_a_clean",
+        "doc_fire_safety.pdf",
+    )
+    with open(sample_path, "rb") as handle:
+        upload_res = client.post(
+            f"/api/applications/{app_id}/documents",
+            headers=headers,
+            files={"files": ("renewed_fire_safety.pdf", handle, "application/pdf")},
+            data={"document_type": "replacement_evidence"},
+        )
+    assert upload_res.status_code == 201
+    document_id = upload_res.json()[0]["id"]
+
+    submit_res = client.post(
+        f"/api/rectifications/{rectification_id}/submit",
+        headers=headers,
+        json={"document_id": document_id, "applicant_note": "Renewed NOC attached."},
+    )
+    assert submit_res.status_code == 200
+    assert submit_res.json()["status"] == "submitted"
+    assert submit_res.json()["submitted_document_id"] == document_id
+
+    resolve_res = client.post(
+        f"/api/rectifications/{rectification_id}/resolve",
+        headers=headers,
+        json={"resolution_note": "Renewed NOC checked and accepted for the demo."},
+    )
+    assert resolve_res.status_code == 200
+    assert resolve_res.json()["status"] == "resolved"
+
+    findings_res = client.get(f"/api/applications/{app_id}/findings", headers=headers)
+    assert findings_res.status_code == 200
+    target = next(item for item in findings_res.json() if item["id"] == finding_id)
+    assert target["status"] == "resolved"
+
+
 def test_overall_scrutiny_recommendation_recording():
     """Scrutiny officer can record final recommendation with mandatory justification."""
     app_id, finding_id, headers = create_case_with_findings()
@@ -143,7 +257,7 @@ def test_export_structured_case_dossier_json():
         headers=headers
     )
 
-    res = client.get(f"/api/applications/{app_id}/export/json")
+    res = client.get(f"/api/applications/{app_id}/export/json", headers=headers)
     assert res.status_code == 200
     dossier = res.json()
 
@@ -160,7 +274,7 @@ def test_export_signed_pdf_scrutiny_dossier():
     """PDF export must generate valid non-empty PDF stream with official structure."""
     app_id, finding_id, headers = create_case_with_findings()
 
-    res = client.get(f"/api/applications/{app_id}/export/pdf")
+    res = client.get(f"/api/applications/{app_id}/export/pdf", headers=headers)
     assert res.status_code == 200
     assert res.headers["content-type"] == "application/pdf"
     assert res.content.startswith(b"%PDF-")
@@ -172,7 +286,7 @@ def test_applicant_restricted_view_redaction():
     app_id, finding_id, headers = create_case_with_findings()
 
     # Before confirmation, no action items
-    res_init = client.get(f"/api/applications/{app_id}/applicant-view")
+    res_init = client.get(f"/api/applications/{app_id}/applicant-view", headers=headers)
     assert res_init.status_code == 200
     data_init = res_init.json()
     assert data_init["action_items_for_applicant"] == []
@@ -185,7 +299,7 @@ def test_applicant_restricted_view_redaction():
     )
 
     # Now applicant sees confirmed deficiency notice without internal scores
-    res_pub = client.get(f"/api/applications/{app_id}/applicant-view")
+    res_pub = client.get(f"/api/applications/{app_id}/applicant-view", headers=headers)
     assert res_pub.status_code == 200
     data_pub = res_pub.json()
     assert len(data_pub["action_items_for_applicant"]) == 1

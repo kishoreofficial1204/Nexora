@@ -1,30 +1,51 @@
 {
-  "timestamp": "2026-10-27T06:43:54.977653Z",
+  "timestamp": "2026-10-27T15:18:34.425368Z",
   "assessment_date": "2026-10-26",
-  "evaluation_version": "M0-Baseline",
+  "evaluation_version": "Pipeline-v1",
   "sample_bundle_count": 9,
   "total_document_count": 54,
   "field_metrics": [
     {
-      "field_type": "institution_name",
-      "sample_size": 9,
+      "field_type": "academic_year",
+      "sample_size": 3,
       "exact_match_rate": 1.0,
       "normalized_match_rate": 1.0,
-      "notes": "Normalized removes trailing punctuation and standardizes abbreviations"
+      "notes": "Academic-year label compared as a normalized string."
+    },
+    {
+      "field_type": "approved_intake",
+      "sample_size": 1,
+      "exact_match_rate": 1.0,
+      "normalized_match_rate": 1.0,
+      "notes": "Pipeline-extracted field compared to ground truth."
     },
     {
       "field_type": "institute_pid",
-      "sample_size": 9,
+      "sample_size": 2,
       "exact_match_rate": 1.0,
       "normalized_match_rate": 1.0,
-      "notes": "Matches AICTE standard regex pattern ^1-[0-9]{10}$"
+      "notes": "AICTE Permanent Institute ID compared as a normalized string."
+    },
+    {
+      "field_type": "institution_name",
+      "sample_size": 5,
+      "exact_match_rate": 1.0,
+      "normalized_match_rate": 1.0,
+      "notes": "Exact and normalized name comparison (legal suffix and punctuation tolerant)."
     },
     {
       "field_type": "intake_capacity",
-      "sample_size": 9,
+      "sample_size": 1,
       "exact_match_rate": 1.0,
       "normalized_match_rate": 1.0,
-      "notes": "Numerical parsing of declared approved intake"
+      "notes": "Declared intake compared after numeric parsing."
+    },
+    {
+      "field_type": "valid_until_date",
+      "sample_size": 2,
+      "exact_match_rate": 1.0,
+      "normalized_match_rate": 1.0,
+      "notes": "Certificate validity date compared as YYYY-MM-DD."
     }
   ],
   "ocr_metrics": [],
@@ -72,6 +93,50 @@
       "recall": 1.0,
       "f1_score": 1.0,
       "sample_size": 9
+    },
+    {
+      "category": "near_duplicate",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_negatives": 8,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "sample_size": 9
+    },
+    {
+      "category": "incremental_pdf_revision",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_negatives": 8,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "sample_size": 9
+    },
+    {
+      "category": "low_confidence_extraction",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 0,
+      "true_negatives": 7,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1_score": 0.6667,
+      "sample_size": 9
+    },
+    {
+      "category": "name_variation",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_negatives": 8,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "sample_size": 9
     }
   ],
   "anomaly_metrics": [
@@ -92,7 +157,16 @@
       "false_positive_rate": 0.0,
       "sample_size": 9,
       "classification": "signal_only_not_proof"
+    },
+    {
+      "signal_type": "low_confidence_extraction",
+      "flagged_count": 2,
+      "known_modified_count": 1,
+      "precision": 0.5,
+      "false_positive_rate": 0.125,
+      "sample_size": 9,
+      "classification": "signal_only_not_proof"
     }
   ],
-  "summary_markdown": "# VeriScope Evaluation Harness Benchmark Report\n**Run Timestamp:** 2026-10-27T06:43:54.977653Z  \n**Assessment Date:** 2026-10-26  \n**Evaluation Stage:** M0-Baseline  \n**Evaluated Bundles (n):** 9 | **Total Documents (n):** 54  \n\n### 1. Deterministic Detection Metrics\n| Evaluation Category | Sample Size (n) | Precision | Recall | F1 Score | Notes |\n|:--------------------|:----------------|:----------|:-------|:---------|:------|\n| missing_document | n = 9 | 1.00 | 1.00 | 1.00 | Ground truth aligned |\n| expired_certificate | n = 9 | 1.00 | 1.00 | 1.00 | Ground truth aligned |\n| intake_consistency | n = 9 | 1.00 | 1.00 | 1.00 | Ground truth aligned |\n| duplicate_sha256 | n = 9 | 1.00 | 1.00 | 1.00 | Ground truth aligned |\n\n### 2. Anomaly Signal Diagnostics (Signals Only — Never Proof of Fraud)\n| Signal Type | Sample Size (n) | Flagged | Known Modified | Precision | False Positive Rate | Classification |\n|:------------|:----------------|:--------|:---------------|:----------|:--------------------|:---------------|\n| incremental_pdf_revision | n = 9 | 1 | 1 | 1.00 | 0.00 | signal_only_not_proof |\n| near_duplicate_perceptual_hash | n = 9 | 1 | 1 | 1.00 | 0.00 | signal_only_not_proof |\n\n### 3. Field Extraction & Provenance Baseline\n| Field Name | Sample Size (n) | Exact Match Rate | Normalized Match Rate | Specification Note |\n|:-----------|:----------------|:-----------------|:----------------------|:-------------------|\n| institution_name | n = 9 | 1.00 | 1.00 | Normalized removes trailing punctuation and standardizes abbreviations |\n| institute_pid | n = 9 | 1.00 | 1.00 | Matches AICTE standard regex pattern ^1-[0-9]{10}$ |\n| intake_capacity | n = 9 | 1.00 | 1.00 | Numerical parsing of declared approved intake |\n\n> **Important:** All metrics above are computed directly from the synthetic test suite with sample sizes indicated (`n`). No marketing claims or unverified percentages are permitted."
+  "summary_markdown": "# VeriScope Evaluation Harness Benchmark Report\n**Run Timestamp:** 2026-10-27T15:18:34.425368Z  \n**Assessment Date:** 2026-10-26  \n**Evaluation Stage:** Pipeline-v1  \n**Evaluated Bundles (n):** 9 | **Total Documents (n):** 54\n\nMetrics below are generated by running the extraction and deterministic validation\npipeline over the synthetic bundles and comparing the output to ground truth.\nThey are a demo benchmark, not production accuracy.\n\n### 1. Deterministic Detection Metrics\n| Evaluation Category | Sample Size (n) | TP | FP | FN | Precision | Recall | F1 Score |\n|:--------------------|:----------------|:---|:---|:---|:----------|:-------|:---------|\n| missing_document | n = 9 | 1 | 0 | 0 | 1.00 | 1.00 | 1.00 |\n| expired_certificate | n = 9 | 1 | 0 | 0 | 1.00 | 1.00 | 1.00 |\n| intake_consistency | n = 9 | 1 | 0 | 0 | 1.00 | 1.00 | 1.00 |\n| duplicate_sha256 | n = 9 | 1 | 0 | 0 | 1.00 | 1.00 | 1.00 |\n| near_duplicate | n = 9 | 1 | 0 | 0 | 1.00 | 1.00 | 1.00 |\n| incremental_pdf_revision | n = 9 | 1 | 0 | 0 | 1.00 | 1.00 | 1.00 |\n| low_confidence_extraction | n = 9 | 1 | 1 | 0 | 0.50 | 1.00 | 0.67 |\n| name_variation | n = 9 | 1 | 0 | 0 | 1.00 | 1.00 | 1.00 |\n\n### 2. Anomaly Signal Diagnostics (Signals Only — Never Proof of Fraud)\n| Signal Type | Sample Size (n) | Flagged | Known Modified | Precision | False Positive Rate | Classification |\n|:------------|:----------------|:--------|:---------------|:----------|:--------------------|:---------------|\n| incremental_pdf_revision | n = 9 | 1 | 1 | 1.00 | 0.00 | signal_only_not_proof |\n| near_duplicate_perceptual_hash | n = 9 | 1 | 1 | 1.00 | 0.00 | signal_only_not_proof |\n| low_confidence_extraction | n = 9 | 2 | 1 | 0.50 | 0.12 | signal_only_not_proof |\n\n### 3. Field Extraction & Provenance\n| Field Name | Sample Size (n) | Exact Match Rate | Normalized Match Rate | Specification Note |\n|:-----------|:----------------|:-----------------|:----------------------|:-------------------|\n| academic_year | n = 3 | 1.00 | 1.00 | Academic-year label compared as a normalized string. |\n| approved_intake | n = 1 | 1.00 | 1.00 | Pipeline-extracted field compared to ground truth. |\n| institute_pid | n = 2 | 1.00 | 1.00 | AICTE Permanent Institute ID compared as a normalized string. |\n| institution_name | n = 5 | 1.00 | 1.00 | Exact and normalized name comparison (legal suffix and punctuation tolerant). |\n| intake_capacity | n = 1 | 1.00 | 1.00 | Declared intake compared after numeric parsing. |\n| valid_until_date | n = 2 | 1.00 | 1.00 | Certificate validity date compared as YYYY-MM-DD. |\n\n**Pipeline errors during this run:** 0\n\n> **Scope note:** This harness uses nine synthetic bundles. Use it to inspect pipeline behaviour and regressions, not to claim production precision or recall."
 }

@@ -102,9 +102,29 @@ def test_supported_external_authorities_list():
     assert "municipal_corporation" in auth_ids
 
 
+def test_rules_and_evaluation_require_authentication():
+    """Rule, institution, and evaluation endpoints must require a valid session."""
+    anonymous = TestClient(app)
+    for path in (
+        "/api/rules",
+        "/api/institutions",
+        "/api/evaluation/latest",
+        "/api/evaluation/bundles",
+    ):
+        res = anonymous.get(path)
+        assert res.status_code == 401, path
+
+    res = anonymous.post("/api/rules/search", json={"query": "intake"})
+    assert res.status_code == 401
+
+
 def test_handbook_source_search():
     """Querying the regulatory handbook index must return relevant excerpts with citations."""
-    res = client.post("/api/rules/search", json={"query": "intake capacity increase norms"})
+    res = client.post(
+        "/api/rules/search",
+        headers=_reviewer_headers(),
+        json={"query": "intake capacity increase norms"},
+    )
     assert res.status_code == 200
     data = res.json()
     assert data["total_matches"] >= 1
@@ -117,9 +137,11 @@ def test_handbook_source_search():
 
 def test_interactive_rule_test_harness():
     """Interactive rule evaluation endpoint must accurately evaluate supplied synthetic facts."""
+    headers = _reviewer_headers()
     # Test 1: Fire safety expiry check with expired date
     res_fail = client.post(
         "/api/rules/test-eval",
+        headers=headers,
         json={
             "rule_id": "RULE-EOA-002",
             "test_facts": {
@@ -137,6 +159,7 @@ def test_interactive_rule_test_harness():
     # Test 2: Fire safety expiry check with valid date
     res_pass = client.post(
         "/api/rules/test-eval",
+        headers=headers,
         json={
             "rule_id": "RULE-EOA-002",
             "test_facts": {
@@ -153,6 +176,7 @@ def test_interactive_rule_test_harness():
     # Test 3: Intake contradiction check
     res_intake = client.post(
         "/api/rules/test-eval",
+        headers=headers,
         json={
             "rule_id": "RULE-EOA-005",
             "test_facts": {

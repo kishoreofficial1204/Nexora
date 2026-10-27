@@ -33,9 +33,17 @@ class Application(Base):
     recommendation_at = Column(DateTime, nullable=True)
     rule_pack_id = Column(String(100), default="pack_eoa_ug_2026")
     created_by_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    # Owning applicant account for the applicant portal. Staff-created demo cases
+    # may leave this null and fall back to created_by_id for ownership checks.
+    applicant_id = Column(String(36), ForeignKey("users.id"), nullable=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
     institution = relationship("Institution", lazy="joined")
     documents = relationship("Document", back_populates="application", cascade="all, delete-orphan", lazy="selectin")
+
+    @property
+    def owner_id(self) -> str:
+        """Applicant owner, falling back to creator for legacy/demo cases."""
+        return self.applicant_id or self.created_by_id

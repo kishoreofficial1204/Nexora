@@ -11,12 +11,17 @@ from sqlalchemy.orm import Session
 
 from apps.api.db.database import get_db
 from apps.api.models.institution import Institution
+from apps.api.models.user import User, UserRole
 from apps.api.schemas.models_schema import InstitutionOut
 from apps.api.rules.loader import get_default_rule_pack
 from apps.api.services.source_search import search_handbook_sources, DRAFT_BANNER, SOURCE_PLACEHOLDER
 from apps.api.pipeline.validator import normalize_institution_name
+from apps.api.core.security import require_roles
 
 router = APIRouter(prefix="/api", tags=["Rules & Reference"])
+
+READ_ROLES = [UserRole.REVIEWER, UserRole.SENIOR_REVIEWER, UserRole.ADMIN, UserRole.AUDITOR]
+REVIEW_ROLES = [UserRole.REVIEWER, UserRole.SENIOR_REVIEWER, UserRole.ADMIN]
 
 
 class RuleSearchRequest(BaseModel):
@@ -30,14 +35,19 @@ class RuleTestEvalRequest(BaseModel):
 
 
 @router.get("/rules")
-def get_rules():
+def get_rules(
+    current_user: User = Depends(require_roles(READ_ROLES)),
+):
     """Returns active versioned rule pack and checklist items."""
     pack = get_default_rule_pack()
     return pack.dict()
 
 
 @router.post("/rules/search")
-def search_rules(req: RuleSearchRequest):
+def search_rules(
+    req: RuleSearchRequest,
+    current_user: User = Depends(require_roles(READ_ROLES)),
+):
     """
     Search official AICTE handbook clauses, chapters, and rule pack citations.
     Returns excerpts with official draft disclaimers.
@@ -46,7 +56,10 @@ def search_rules(req: RuleSearchRequest):
 
 
 @router.post("/rules/test-eval")
-def test_evaluate_rule(req: RuleTestEvalRequest):
+def test_evaluate_rule(
+    req: RuleTestEvalRequest,
+    current_user: User = Depends(require_roles(REVIEW_ROLES)),
+):
     """
     Interactive rule evaluation test harness.
     Allows scrutiny officers or developers to test a specific rule with synthetic facts.
@@ -156,6 +169,9 @@ def test_evaluate_rule(req: RuleTestEvalRequest):
 
 
 @router.get("/institutions", response_model=List[InstitutionOut])
-def get_institutions(db: Session = Depends(get_db)):
+def get_institutions(
+    current_user: User = Depends(require_roles(READ_ROLES)),
+    db: Session = Depends(get_db),
+):
     """Returns available institutional profiles."""
     return db.query(Institution).all()

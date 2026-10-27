@@ -23,6 +23,8 @@ import { fetchApi } from "@/lib/api";
 
 interface ApplicantNotice {
   notice_id: string;
+  rectification_id?: string | null;
+  rectification_status?: string | null;
   document_reference: string;
   notice_type: string;
   title: string;
@@ -59,42 +61,67 @@ export default function ApplicantPortalPage() {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadComplete, setUploadComplete] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const loadApplicantData = async () => {
+    try {
+      setLoading(true);
+      const res = await fetchApi<ApplicantViewData>(`/applications/${id}/applicant-view`);
+      setData(res);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadApplicantData() {
-      try {
-        setLoading(true);
-        const res = await fetchApi<ApplicantViewData>(`/applications/${id}/applicant-view`);
-        setData(res);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
     if (id) {
       loadApplicantData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const handleSimulatedUpload = async (e: React.FormEvent) => {
+  const handleReplacementUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadNotice || !uploadFile) return;
+    if (!uploadNotice.rectification_id) {
+      setUploadError("A formal clarification request is required before evidence can be submitted.");
+      return;
+    }
+
     setUploading(true);
     setUploadComplete(false);
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setData((current) =>
-      current
-        ? {
-            ...current,
-            action_items_for_applicant: current.action_items_for_applicant.map((item) =>
-              item.notice_id === uploadNotice.notice_id ? { ...item, status: "submitted" } : item
-            ),
-          }
-        : current
-    );
-    setUploading(false);
-    setUploadComplete(true);
+    setUploadError(null);
+    try {
+      const formData = new FormData();
+      formData.append("files", uploadFile);
+      formData.append("document_type", "replacement_evidence");
+
+      const uploaded = await fetchApi<Array<{ id: string }>>(
+        `/applications/${id}/documents`,
+        { method: "POST", body: formData }
+      );
+      if (!uploaded.length) {
+        throw new Error("The replacement file was not accepted.");
+      }
+
+      await fetchApi(`/rectifications/${uploadNotice.rectification_id}/submit`, {
+        method: "POST",
+        body: JSON.stringify({
+          document_id: uploaded[0].id,
+          applicant_note: "Replacement evidence submitted through the applicant portal.",
+        }),
+      });
+
+      await loadApplicantData();
+      setUploadComplete(true);
+    } catch (err) {
+      console.error(err);
+      setUploadError(err instanceof Error ? err.message : "Replacement submission failed.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   if (loading || !data) {
@@ -219,12 +246,27 @@ export default function ApplicantPortalPage() {
                         setUploadNotice(item);
                         setUploadFile(null);
                         setUploadComplete(false);
+                        setUploadError(null);
                       }}
-                      disabled={item.status === "submitted"}
+                      disabled={
+                        !item.rectification_id ||
+                        item.rectification_status === "submitted" ||
+                        item.rectification_status === "resolved"
+                      }
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-accent text-accent-foreground font-semibold text-xs hover:bg-teal-600 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {item.status === "submitted" ? <FileCheck2 className="w-3.5 h-3.5" /> : <UploadCloud className="w-3.5 h-3.5" />}
-                      <span>{item.status === "submitted" ? "Replacement submitted" : "Submit Clarification / Re-upload"}</span>
+                      {item.rectification_status === "submitted" || item.rectification_status === "resolved" ? (
+                        <FileCheck2 className="w-3.5 h-3.5" />
+                      ) : (
+                        <UploadCloud className="w-3.5 h-3.5" />
+                      )}
+                      <span>
+                        {!item.rectification_id
+                          ? "Awaiting formal clarification request"
+                          : item.rectification_status === "submitted" || item.rectification_status === "resolved"
+                            ? "Replacement submitted"
+                            : "Submit Clarification / Re-upload"}
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -291,11 +333,11 @@ export default function ApplicantPortalPage() {
                 </div>
                 <h4 className="text-sm font-semibold text-slate-100">Replacement evidence submitted</h4>
                 <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
-                  The prototype has recorded the simulated applicant response and marked this notice as submitted.
-                  The reviewer can now re-run validation from the case workspace.
+                  The replacement file has been stored, linked to this clarification request, and added
+                  to the audit trail. The reviewer can now re-run validation from the case workspace.
                 </p>
-                <div className="inline-flex items-center gap-1.5 text-[10px] font-mono text-cyan-300 bg-cyan-950/40 border border-cyan-900 rounded px-2 py-1">
-                  <ShieldCheck className="w-3 h-3" /> Demo simulation — no file was transmitted
+                <div className="inline-flex items-center gap-1.5 text-[10px] font-mono text-emerald-300 bg-emerald-950/40 border border-emerald-900 rounded px-2 py-1">
+                  <ShieldCheck className="w-3 h-3" /> Persisted in the demo case record
                 </div>
                 <div className="pt-2">
                   <button
@@ -311,7 +353,7 @@ export default function ApplicantPortalPage() {
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSimulatedUpload} className="space-y-4">
+              <form onSubmit={handleReplacementUpload} className="space-y-4">
                 <div className="p-3 rounded-md bg-surface border border-surface-border text-[11px] text-slate-300 leading-relaxed">
                   <span className="font-semibold text-amber-300">Requested item:</span> {uploadNotice.requirement_summary}
                 </div>
@@ -321,7 +363,7 @@ export default function ApplicantPortalPage() {
                     {uploadFile ? uploadFile.name : "Choose a replacement PDF or image"}
                   </div>
                   <div className="text-[10px] text-muted-foreground mt-1">
-                    PDF, JPG or PNG · up to 25 MB · simulated demo upload
+                    PDF, JPG or PNG · up to 25 MB · stored in the demo case record
                   </div>
                   <input
                     type="file"
@@ -330,6 +372,11 @@ export default function ApplicantPortalPage() {
                     onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
                   />
                 </label>
+                {uploadError && (
+                  <div className="rounded-md border border-red-800 bg-red-950/40 px-3 py-2 text-[11px] text-red-200">
+                    {uploadError}
+                  </div>
+                )}
                 <div className="flex items-center justify-end gap-2 pt-2 border-t border-surface-border">
                   <button
                     type="button"

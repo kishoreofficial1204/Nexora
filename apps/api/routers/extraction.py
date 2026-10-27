@@ -26,6 +26,17 @@ from apps.api.pipeline.extractor import extract_document_fields
 router = APIRouter(prefix="/api", tags=["Extraction & Provenance"])
 
 
+def _ensure_document_access(document: Document, current_user: User, db: Session) -> None:
+    if current_user.role != UserRole.APPLICANT:
+        return
+    app = db.query(Application).filter(Application.id == document.application_id).first()
+    if not app or app.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden: You cannot access documents from this application.",
+        )
+
+
 class FieldCorrectionRequest(BaseModel):
     normalized_value: str
     review_status: str = FieldReviewStatus.CORRECTED
@@ -137,6 +148,7 @@ def get_document_fields(
     doc = db.query(Document).filter(Document.id == id).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found.")
+    _ensure_document_access(doc, current_user, db)
 
     fields = db.query(ExtractedField).filter(ExtractedField.document_id == id).all()
     return fields
@@ -231,6 +243,7 @@ def render_page_image(
     doc_rec = db.query(Document).filter(Document.id == id).first()
     if not doc_rec:
         raise HTTPException(status_code=404, detail="Document not found.")
+    _ensure_document_access(doc_rec, current_user, db)
 
     import os
     if not os.path.exists(doc_rec.storage_path):

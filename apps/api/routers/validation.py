@@ -84,6 +84,9 @@ def get_application_findings(
     if not app:
         raise HTTPException(status_code=404, detail="Application case not found.")
 
+    if current_user.role == UserRole.APPLICANT and app.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Forbidden: You do not have access to this application.")
+
     # RBAC constraint: Applicants must not see internal risk signals or heuristic notes
     findings_query = db.query(Finding).filter(Finding.application_id == id).order_by(desc(Finding.created_at))
 

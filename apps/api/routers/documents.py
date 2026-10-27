@@ -33,7 +33,7 @@ async def upload_documents(
     if not app:
         raise HTTPException(status_code=404, detail="Application case not found.")
 
-    if current_user.role == UserRole.APPLICANT and app.created_by_id != current_user.id:
+    if current_user.role == UserRole.APPLICANT and app.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Forbidden: Cannot upload documents to another applicant's case.")
 
     created_docs = []
@@ -93,7 +93,7 @@ def get_document_file(
     if not app:
         raise HTTPException(status_code=404, detail="Associated application case not found.")
 
-    if current_user.role == UserRole.APPLICANT and app.created_by_id != current_user.id:
+    if current_user.role == UserRole.APPLICANT and app.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Forbidden: You cannot access documents from this application.")
 
     import os

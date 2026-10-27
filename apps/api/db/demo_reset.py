@@ -33,6 +33,7 @@ from apps.api.models import (
     DocumentAnalysis,
     ExtractedField,
     Finding,
+    FindingStatus,
     Institution,
     Job,
     RectificationRequest,
@@ -46,7 +47,12 @@ from apps.api.core.audit_logger import log_audit_event
 from apps.api.routers.applications import seed_demo_application
 from apps.api.routers.extraction import run_application_extraction
 from apps.api.routers.validation import run_validation_endpoint
-from apps.api.routers.review import ApplicationRecommendationRequest, record_officer_recommendation
+from apps.api.routers.review import (
+    ApplicationRecommendationRequest,
+    FindingReviewRequest,
+    record_officer_recommendation,
+    review_finding,
+)
 from apps.api.services.verification import verify_application_document
 
 
@@ -167,6 +173,7 @@ def seed_curated_demo() -> None:
         reviewer = db.query(User).filter(User.role == UserRole.REVIEWER).first()
         if not reviewer:
             raise RuntimeError("Demo reviewer account was not created.")
+        applicant = db.query(User).filter(User.role == UserRole.APPLICANT).first()
 
         print("[SEED] Building curated synthetic queue...")
         apps: dict[str, Application] = {}
@@ -240,6 +247,37 @@ def seed_curated_demo() -> None:
             "bundle_g_modified_pdf",
             validate=False,
         )
+
+        # Seed one live clarification request so the applicant portal has a
+        # persisted action item and the re-upload path is demo-ready.
+        expired_finding = (
+            db.query(Finding)
+            .filter(
+                Finding.application_id == apps["bundle_c_expired_cert"].id,
+                Finding.status == FindingStatus.OPEN,
+            )
+            .first()
+        )
+        if expired_finding:
+            review_finding(
+                id=expired_finding.id,
+                req=FindingReviewRequest(
+                    action="request_clarification",
+                    rationale=(
+                        "The submitted Fire Safety NOC expires before the assessment date. "
+                        "Please upload a renewed certificate for re-validation."
+                    ),
+                    clarification_item="Renewed Fire Safety NOC",
+                ),
+                current_user=reviewer,
+                db=db,
+            )
+
+        # Curated cases belong to the demo applicant so the applicant portal is
+        # usable while the reviewer still sees the full queue.
+        if applicant:
+            for app in apps.values():
+                app.applicant_id = applicant.id
 
         db.commit()
 

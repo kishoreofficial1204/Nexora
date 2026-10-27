@@ -16,12 +16,25 @@ from sqlalchemy.orm import Session
 from apps.api.db.database import get_db
 from apps.api.models.application import Application, ApplicationStatus
 from apps.api.models.finding import Finding, FindingStatus
-from apps.api.models.user import User
+from apps.api.models.rectification import RectificationRequest, RectificationStatus
+from apps.api.models.user import User, UserRole
 from apps.api.core.security import get_current_user, require_roles
 from apps.api.core.audit_logger import log_audit_event
 from apps.api.services.report_generator import build_case_dossier_json, generate_case_dossier_pdf
 
 router = APIRouter(prefix="/api", tags=["Review Console & Reports"])
+
+REVIEW_ROLES = [UserRole.REVIEWER, UserRole.SENIOR_REVIEWER, UserRole.ADMIN]
+READ_ROLES = [UserRole.REVIEWER, UserRole.SENIOR_REVIEWER, UserRole.ADMIN, UserRole.AUDITOR]
+
+
+def _ensure_case_access(application: Application, current_user: User) -> None:
+    """Applicants may only see their own case; staff roles may see all cases."""
+    if current_user.role == UserRole.APPLICANT and application.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden: You do not have access to this application.",
+        )
 
 
 class FindingReviewRequest(BaseModel):
@@ -67,7 +80,7 @@ class ApplicationRecommendationRequest(BaseModel):
 def review_finding(
     id: str,
     req: FindingReviewRequest,
-    current_user: User = Depends(require_roles(["reviewer", "senior_reviewer", "admin"])),
+    current_user: User = Depends(require_roles(REVIEW_ROLES)),
     db: Session = Depends(get_db)
 ):
     """
@@ -93,6 +106,33 @@ def review_finding(
     finding.reviewed_by = current_user.email
     finding.reviewed_at = datetime.utcnow()
 
+    # A clarification request is surfaced in the applicant portal as a persisted
+    # rectification item rather than a UI-only placeholder.
+    rectification = None
+    if req.action == "request_clarification":
+        rectification = (
+            db.query(RectificationRequest)
+            .filter(
+                RectificationRequest.finding_id == finding.id,
+                RectificationRequest.status.in_(
+                    [RectificationStatus.OPEN, RectificationStatus.SUBMITTED]
+                ),
+            )
+            .first()
+        )
+        if not rectification:
+            first_ref = finding.evidence_refs[0] if finding.evidence_refs else {}
+            rectification = RectificationRequest(
+                application_id=finding.application_id,
+                finding_id=finding.id,
+                document_type=first_ref.get("document_type") or finding.finding_type,
+                request_message=req.clarification_item or finding.recommended_action,
+                status=RectificationStatus.OPEN,
+                requested_by=current_user.id,
+            )
+            db.add(rectification)
+            db.flush()
+
     # Append-only cryptographic audit logging
     log_audit_event(
         db=db,
@@ -107,7 +147,8 @@ def review_finding(
             "old_status": old_status,
             "new_status": new_status,
             "rationale": req.rationale,
-            "clarification_item": req.clarification_item
+            "clarification_item": req.clarification_item,
+            "rectification_id": rectification.id if rectification else None
         }
     )
 
@@ -119,7 +160,8 @@ def review_finding(
         "status": finding.status,
         "review_rationale": finding.review_rationale,
         "reviewed_by": finding.reviewed_by,
-        "reviewed_at": finding.reviewed_at.isoformat() + "Z"
+        "reviewed_at": finding.reviewed_at.isoformat() + "Z",
+        "rectification_id": rectification.id if rectification else None
     }
 
 
@@ -127,7 +169,7 @@ def review_finding(
 def record_officer_recommendation(
     id: str,
     req: ApplicationRecommendationRequest,
-    current_user: User = Depends(require_roles(["reviewer", "senior_reviewer", "admin"])),
+    current_user: User = Depends(require_roles(REVIEW_ROLES)),
     db: Session = Depends(get_db)
 ):
     """
@@ -172,6 +214,7 @@ def record_officer_recommendation(
 @router.get("/applications/{id}/export/json")
 def export_application_dossier_json(
     id: str,
+    current_user: User = Depends(require_roles(READ_ROLES)),
     db: Session = Depends(get_db)
 ):
     """Returns complete machine-readable case dossier in structured JSON format."""
@@ -185,6 +228,7 @@ def export_application_dossier_json(
 @router.get("/applications/{id}/export/pdf")
 def export_application_dossier_pdf(
     id: str,
+    current_user: User = Depends(require_roles(READ_ROLES)),
     db: Session = Depends(get_db)
 ):
     """Generates and downloads an exportable scrutiny dossier in signed PDF format."""
@@ -205,6 +249,7 @@ def export_application_dossier_pdf(
 @router.get("/applications/{id}/applicant-view")
 def get_applicant_restricted_view(
     id: str,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -215,22 +260,35 @@ def get_applicant_restricted_view(
     app = db.query(Application).filter(Application.id == id).first()
     if not app:
         raise HTTPException(status_code=404, detail="Application not found.")
+    _ensure_case_access(app, current_user)
 
     findings = db.query(Finding).filter(Finding.application_id == app.id).all()
+    finding_ids = [f.id for f in findings]
+    rectifications = (
+        db.query(RectificationRequest)
+        .filter(RectificationRequest.finding_id.in_(finding_ids))
+        .all()
+        if finding_ids
+        else []
+    )
+    rect_by_finding = {r.finding_id: r for r in rectifications}
 
-    # Redact heuristic anomaly signals and internal detector metrics
-    # Only confirmed findings and clarification requests are shown to the applicant
+    # Redact heuristic anomaly signals and internal detector metrics.
+    # Only confirmed findings and clarification requests are shown to the applicant.
     applicant_notices = []
     for f in findings:
         if f.status in (FindingStatus.CONFIRMED, FindingStatus.CLARIFICATION_REQUESTED):
+            rectification = rect_by_finding.get(f.id)
             applicant_notices.append({
                 "notice_id": f.id,
+                "rectification_id": rectification.id if rectification else None,
+                "rectification_status": rectification.status if rectification else None,
                 "document_reference": f.evidence_refs[0].get("document_name") if f.evidence_refs else "General Submission",
                 "notice_type": "CLARIFICATION_REQUEST" if f.status == FindingStatus.CLARIFICATION_REQUESTED else "DEFICIENCY_NOTE",
                 "title": f.title,
                 "requirement_summary": f.recommended_action,
                 "scrutiny_rationale": f.review_rationale or "Please provide updated official document.",
-                "status": f.status
+                "status": rectification.status if rectification else f.status
             })
 
     documents_summary = [

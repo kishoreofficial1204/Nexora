@@ -47,7 +47,8 @@ interface EvaluationReport {
   total_document_count: number;
   field_metrics: FieldMetric[];
   detection_metrics: DetectionMetric[];
-  anomaly_signal_metrics?: any[];
+  anomaly_metrics?: any[];
+  summary_markdown?: string;
 }
 
 export default function EvaluationDashboardPage() {
@@ -113,11 +114,12 @@ export default function EvaluationDashboardPage() {
                 VeriScope Evaluation & Benchmark Harness
               </h1>
               <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-surface border border-surface-border text-slate-400">
-                {report?.evaluation_version || "M0-Baseline"}
+                {report?.evaluation_version || "Pipeline-v1"}
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Rigorous empirical evaluation against synthetic ground truth (n = 9 bundles, 54 documents). Never fabricated.
+              Pipeline-generated results compared against synthetic ground truth (n = 9 bundles).
+              This is a demo benchmark, not production accuracy.
             </p>
           </div>
 

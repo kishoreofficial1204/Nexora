@@ -6,14 +6,21 @@ Allows running the evaluation suite dynamically.
 
 import os
 import json
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from eval.evaluate import run_evaluation, OUTPUT_REPORT_JSON, GROUND_TRUTH_FILE
+from apps.api.models.user import User, UserRole
+from apps.api.core.security import require_roles
 
 router = APIRouter(prefix="/api/evaluation", tags=["Evaluation Harness"])
 
+READ_ROLES = [UserRole.REVIEWER, UserRole.SENIOR_REVIEWER, UserRole.ADMIN, UserRole.AUDITOR]
+REVIEW_ROLES = [UserRole.REVIEWER, UserRole.SENIOR_REVIEWER, UserRole.ADMIN]
+
 
 @router.get("/latest")
-def get_latest_evaluation_report():
+def get_latest_evaluation_report(
+    current_user: User = Depends(require_roles(READ_ROLES)),
+):
     """Returns latest stored evaluation benchmark report."""
     if not os.path.exists(OUTPUT_REPORT_JSON):
         # Run if not generated
@@ -25,7 +32,9 @@ def get_latest_evaluation_report():
 
 
 @router.post("/run")
-def trigger_evaluation_run():
+def trigger_evaluation_run(
+    current_user: User = Depends(require_roles(REVIEW_ROLES)),
+):
     """Triggers real-time evaluation over synthetic bundles and returns fresh metrics."""
     try:
         report = run_evaluation()
@@ -35,7 +44,9 @@ def trigger_evaluation_run():
 
 
 @router.get("/bundles")
-def get_benchmark_bundles():
+def get_benchmark_bundles(
+    current_user: User = Depends(require_roles(READ_ROLES)),
+):
     """Returns synthetic benchmark bundle catalog with upfront ground truth."""
     if not os.path.exists(GROUND_TRUTH_FILE):
         raise HTTPException(status_code=404, detail="Ground truth file not found.")
