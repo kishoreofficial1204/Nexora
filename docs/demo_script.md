@@ -14,7 +14,7 @@
 | **1:00 - 2:30** | **Scenario 1: Clean Approval Path (Bundle A)** | `reviewer@aicte-demo.in` | • Seed Bundle A (`ABC Institute of Technology`)<br/>• OCR extraction & bounding box overlay<br/>• Zero deficiencies flagged; instant clean checklist.<br/>• Scrutiny Officer records recommendation: `RECOMMEND_APPROVAL`. |
 | **2:30 - 4:30** | **Scenario 2: Deficient Case (Bundle C + D)** | `reviewer@aicte-demo.in` | • Seed Bundle C (Expired Fire NOC) & Bundle D (Intake Contradiction)<br/>• **Date Arithmetic:** NOC expired on 2026-03-31 vs Assessment Date 2026-10-26.<br/>• **Dual-Ended Evidence:** Highlighting Application (60 seats) vs Approval Letter (120 seats) simultaneously.<br/>• Reviewer actions: Confirm finding with **mandatory rationale**; request clarification from applicant.<br/>• View **Applicant Portal:** Internal signals redacted, only actionable deficiency notices visible. |
 | **4:30 - 6:00** | **Scenario 3: Anomaly Signals (Bundle E + G)** | `reviewer@aicte-demo.in` & `senior_reviewer@...` | • Seed Bundle E (Duplicate SHA-256) & Bundle G (Modified PDF)<br/>• **Signals, not proof of fraud:** Cautious language alert for multiple incremental xref revisions.<br/>• **Simulated Connector:** External Fire Department registry lookup demonstrating `mismatch` and `timeout` fail-closed behavior.<br/>• Escalate to Senior Reviewer with justification. |
-| **6:00 - 7:00** | **Cryptographic Audit, Reports & Eval** | `auditor@aicte-demo.in` | • Review unbroken SHA-256 append-only ledger.<br/>• One-click export of **Signed PDF Scrutiny Dossier** & **Structured JSON**.<br/>• Visit `/evaluation` dashboard: 100% precision/recall across benchmark suite. |
+| **6:00 - 7:00** | **Cryptographic Audit, Reports & Eval** | `auditor@aicte-demo.in` | • Review unbroken SHA-256 append-only ledger.<br/>• One-click export of **Signed PDF Scrutiny Dossier** & **Structured JSON**.<br/>• Visit `/evaluation` dashboard: pipeline-generated results against synthetic ground truth, with the low-confidence false positive shown honestly. |
 
 ---
 
@@ -98,7 +98,8 @@
      - Click **"Download Signed PDF Dossier"**: open the generated PDF with AICTE header, SHA-256 document inventory, findings disposition log, and officer signature block.
      - Click **"Download Structured JSON"**: show the clean machine-readable format.
   3. Navigate to **`/evaluation`**:
-     - Show the Evaluation Harness: 100% precision and recall across all 9 synthetic benchmark bundles.
+     - Show the Evaluation Harness: metrics are generated from real pipeline runs over 9 synthetic bundles, not hand-entered numbers.
+     - Point out the honest low-confidence false positive and explain that the benchmark is small and synthetic.
      - Click **"Run Evaluation Harness"**: watch it evaluate live in seconds.
 
 ---

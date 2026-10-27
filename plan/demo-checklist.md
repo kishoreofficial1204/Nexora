@@ -36,13 +36,18 @@
 - All institutions, documents, and registry responses are synthetic/simulated.
 - Findings are advisory; no automatic approval or rejection.
 - The demo does not connect to real AICTE, DigiLocker, or issuer databases.
-- Applicant re-upload is simulated in the current prototype.
-- Evaluation metrics are being upgraded from the baseline harness to real
-  per-case predictions.
+- Applicant re-upload is persisted, but a reviewer must re-run validation after a
+  replacement arrives.
+- Evaluation metrics are generated from real pipeline runs over a small synthetic
+  benchmark; they are not production accuracy claims.
 
 ## Recovery steps
 
 - If the queue looks polluted after tests, rerun `demo_reset.py`.
-- If the UI looks unstyled or stale, restart the Next dev server after removing
-  `apps/web/.next`.
+- If the UI is stuck on “Loading the review queue…” or looks unstyled, check the
+  browser network tab for `/_next/static/...` 404s. Stop the dev server, delete
+  `apps/web/.next`, and restart `npm run dev`.
+- Do **not** run `npm run build` while the dev server is running; it replaces the
+  dev asset tree and causes exactly those 404s. Build only with the dev server
+  stopped, or run the production server with `npm run start`.
 - If the API returns old schemas, restart the single uvicorn instance on port 8000.

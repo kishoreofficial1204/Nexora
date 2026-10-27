@@ -85,12 +85,14 @@ flowchart LR
 
 ## 4. Evaluation Status
 
-The evaluation UI and report are **baseline/demo instrumentation**, not a published
-benchmark. The current harness emits placeholder baseline metrics rather than
-per-case predictions. Replacing these with precision/recall computed from actual
-pipeline runs is tracked in [`plan/roadmap.md`](plan/roadmap.md).
+The harness now runs the actual extraction and deterministic validation pipeline
+over the nine synthetic bundles and compares its findings and extracted fields
+against ground truth. The evaluation dashboard and `eval/latest_eval_report.*`
+therefore reflect pipeline predictions rather than hand-entered numbers.
 
-Do not cite the current report as evidence of production accuracy.
+This is still a **small synthetic demo benchmark**, not an independent accuracy
+audit. Do not cite it as evidence of production precision or recall. Current
+results and limitations are summarized in [`plan/roadmap.md`](plan/roadmap.md).
 
 ---
 
