@@ -1,5 +1,6 @@
-# VeriScope (SIH26261)
-> **AI-Powered Application Validation, Document Authentication & Regulatory Compliance Verification for AICTE Scrutiny Officers**  
+# VeriScope
+> **Evidence-backed application scrutiny for technical-education regulatory review**
+>
 > *"One application, one evidence-backed review workspace."*
 
 ---
@@ -36,8 +37,8 @@ flowchart LR
 | **7** | **Originals Immutable** | Uploaded documents are stored with SHA-256 digests. Reviewer corrections create field versions while preserving raw OCR text. |
 | **8** | **Discrete Status Enum** | Uses 7 distinct states: `pass`, `fail`, `warning`, `pending`, `not_verified`, `not_applicable`, `manual_review_required`. |
 | **9** | **Synthetic Data Only** | 100% synthetic PDF generation watermarked `"SAMPLE: NOT AN OFFICIAL DOCUMENT"`. |
-| **10**| **Draft Rule Notices** | Rule catalog and matrices prominently banner: `"UNVERIFIED AGAINST CURRENT HANDBOOK: DRAFT RULES FOR DEMO DECISION SUPPORT"`. |
-| **11**| **Configurable Assessment Date** | Validity calculations compute dynamically against the application's assessment date (default `2026-10-26`). |
+| **10**| **Draft Rule Notices** | Rule catalog and matrices carry a draft-rule notice and require confirmation against the current handbook before operational use. |
+| **11**| **Configurable Assessment Date** | Validity calculations compute against each application's assessment date. The curated demo uses a fixed baseline so results are reproducible. |
 
 ---
 
@@ -75,32 +76,28 @@ flowchart LR
 - Machine-readable JSON dossier export for downstream AICTE ERP integration.
 - Public Applicant View redacting heuristic anomaly signals and internal confidence scores.
 
-### 📊 6. Evaluation Benchmark & Live Presentation (`Milestone 6`)
-- Automated evaluation harness ([`eval/evaluate.py`](file:///d:/SIH%20part%202/eval/evaluate.py)) benchmarking 9 synthetic bundles against ground-truth.
-- Evaluation dashboard ([`apps/web/app/evaluation/page.tsx`](file:///d:/SIH%20part%202/apps/web/app/evaluation/page.tsx)) showing precision, recall, and false positive metrics.
-- Complete 7-minute live presentation script ([`docs/demo_script.md`](file:///d:/SIH%20part%202/docs/demo_script.md)) covering 3 core AICTE scenarios.
+### 📊 6. Evaluation Harness & Live Presentation (`Milestone 6`)
+- Evaluation harness ([`eval/evaluate.py`](eval/evaluate.py)) over 9 synthetic bundles with ground truth.
+- Evaluation dashboard ([`apps/web/app/evaluation/page.tsx`](apps/web/app/evaluation/page.tsx)) for inspecting benchmark output.
+- 7-minute live presentation script ([`docs/demo_script.md`](docs/demo_script.md)) covering core AICTE scenarios.
 
 ---
 
-## 4. Evaluation Benchmark Results
+## 4. Evaluation Status
 
-Computed on 9 synthetic bundles (54 documents) via `eval/evaluate.py`:
+The evaluation UI and report are **baseline/demo instrumentation**, not a published
+benchmark. The current harness emits placeholder baseline metrics rather than
+per-case predictions. Replacing these with precision/recall computed from actual
+pipeline runs is tracked in [`plan/roadmap.md`](plan/roadmap.md).
 
-| Evaluation Category | Sample Size ($n$) | Precision | Recall | F1 Score | Ground-Truth Target |
-|:--------------------|:-----------------|:----------|:-------|:---------|:--------------------|
-| **Missing Document Completeness** | $n = 9$ | **1.00** | **1.00** | **1.00** | Missing Affiliation detected |
-| **Expired Certificate Detection** | $n = 9$ | **1.00** | **1.00** | **1.00** | Fire NOC expiration flagged |
-| **Cross-Doc Intake Capacity Mismatch** | $n = 9$ | **1.00** | **1.00** | **1.00** | 300 vs 240 contradiction linked |
-| **Exact Duplicate SHA-256** | $n = 9$ | **1.00** | **1.00** | **1.00** | Duplicate upload isolated |
-| **Structural Incremental PDF Revision** | $n = 9$ | **1.00** | **1.00** | **1.00** | Flagged as cautious signal only |
-| **Institution Name Variation** | $n = 9$ | **1.00** | **1.00** | **1.00** | Abbreviation discrepancy alerted |
+Do not cite the current report as evidence of production accuracy.
 
 ---
 
 ## 5. Technology Stack & Prerequisites
 
 - **Backend:** Python 3.11+, FastAPI, SQLAlchemy, SQLite, Pydantic v2, PyMuPDF (fitz), RapidOCR ONNX, ReportLab, Bcrypt, PyJWT.
-- **Frontend:** Next.js 16 (App Router), TypeScript, Tailwind CSS, Lucide React.
+- **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS, Lucide React.
 - **Prerequisites:**
   - Python 3.11 or higher
   - Node.js 20 or higher & npm
@@ -114,7 +111,7 @@ Computed on 9 synthetic bundles (54 documents) via `eval/evaluate.py`:
 ```bash
 # Clone the repository
 git clone <repo-url>
-cd "SIH part 2"
+cd VeriScope
 
 # Create and activate virtual environment
 python -m venv .venv
@@ -167,7 +164,7 @@ npm run dev
 ## 8. Repository Structure
 
 ```text
-SIH part 2/
+VeriScope/
 ├── apps/
 │   ├── api/                     # FastAPI Backend Application
 │   │   ├── core/                # Security, RBAC, Cryptographic Audit Logger
@@ -176,8 +173,8 @@ SIH part 2/
 │   │   ├── pipeline/            # RapidOCR Engine, Classifier, Extractor, Validator
 │   │   ├── routers/             # API Endpoints (auth, applications, review, rules, etc.)
 │   │   ├── services/            # Mock Issuer Connector, Report Generator, Storage
-│   │   └── tests/               # 32 Pytest unit & integration tests
-│   └── web/                     # Next.js 16 Web Application
+│   │   └── tests/               # Pytest unit & integration tests
+│   └── web/                     # Next.js 14 Web Application
 │       ├── app/                 # App Router (Dashboard, Workbench, Rules, Evaluation, Applicant)
 │       └── components/          # Reusable UI components (Status badges, mod-cards)
 ├── data/
@@ -193,7 +190,7 @@ SIH part 2/
 ---
 
 ## 9. Live Demo Walkthrough
-For the live 7-minute judging demonstration, refer to [`docs/demo_script.md`](file:///d:/SIH%20part%202/docs/demo_script.md):
+For the live 7-minute demonstration, refer to [`docs/demo_script.md`](docs/demo_script.md):
 - **Scenario 1:** The "Golden Path" (`bundle_a_clean`) — Zero false alarms, clean matrix, PDF dossier export.
 - **Scenario 2:** Cross-Document Conflict & Dual Bounding Box (`bundle_d_intake_mismatch`) — Resolving 300 vs 240 intake discrepancies with dual citations.
 - **Scenario 3:** Suspicious Document & Anomaly Signals (`bundle_g_modified_pdf`) — Heuristic signals without reckless fraud accusations + external verification checks.
@@ -201,6 +198,6 @@ For the live 7-minute judging demonstration, refer to [`docs/demo_script.md`](fi
 ---
 
 ## 10. Compliance & Limitations
-- **Rules Status:** Rules are loaded from [`rules/packs/eoa_v2026_draft.yaml`](file:///d:/SIH%20part%202/rules/packs/eoa_v2026_draft.yaml) and are marked **DRAFT**. They require formal AICTE council ratification before statutory use.
+- **Rules Status:** Rules are loaded from [`rules/packs/eoa_v2026_draft.yaml`](rules/packs/eoa_v2026_draft.yaml) and are marked **DRAFT**. They require formal AICTE council ratification before statutory use.
 - **External Connectors:** External APIs are simulated mocks with configurable delay and status injection.
 - **Data Privacy:** Uses purely synthetic data. All PDF documents are watermarked `"SAMPLE: NOT AN OFFICIAL DOCUMENT"`.

@@ -8,25 +8,43 @@ node_modules/
 out/
 build/
 dist/
+*.tsbuildinfo
 
 # Python cache & virtualenv
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.env
 .venv/
 env/
 venv/
 .pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
 
-# Storage & DB
+# Environment
+.env
+.env.*
+!.env.example
+
+# Storage & local DB
 storage/documents/*
 !storage/documents/.gitkeep
 *.db
+*.sqlite
+*.sqlite3
 
+# Local logs and debug artifacts
+*.log
+api.log
+web.log
+test-run.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# OS & Browser Temporary
+# OS & browser temporary files
 .DS_Store
 Thumbs.db
 .chrome_tmp/
@@ -35,3 +53,8 @@ eval_shot.png
 findings_shot.png
 frame_test.png
 
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
