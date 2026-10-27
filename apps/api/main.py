@@ -34,6 +34,7 @@ app.add_middleware(
         "http://localhost:8000",
         "http://127.0.0.1:8000"
     ],
+    allow_origin_regex=r"https://.*\.onrender\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -71,3 +72,4 @@ async def generic_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={"detail": f"Internal server error: {str(exc)}"}
     )
+
